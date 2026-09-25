@@ -1,0 +1,36 @@
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    database: 15
+
+mall:
+  redis:
+    enabled: true
+    null-value-ttl-seconds: 60
+    redisson:
+      enabled: true
+      host: 127.0.0.1
+      port: 6379
+      database: 15          # 用独立库，避免污染
+      pool-size: 8
+      min-idle-size: 2
+
+  session:
+    enabled: true
+    timeout-seconds: 10
+    sliding-expiration: true
+    session-id-length: 16
+    clients:
+      member:
+        key-prefix: "test:session:member:"
+        device-types: [ PC, H5, APP, MINI ]
+        same-device-kick: true
+        max-per-device: 0
+        allow-unknown-device: false
+      admin:
+        key-prefix: "test:session:admin:"
+        device-types: [ PC ]
+        same-device-kick: true
+        max-per-device: 1
+        allow-unknown-device: false

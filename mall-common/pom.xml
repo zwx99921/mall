@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.we</groupId>
+        <artifactId>mall-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>mall-common</artifactId>
+
+    <packaging>pom</packaging>
+    <name>Mall Common Parent</name>
+    <modules>
+        <module>mall-common-core</module>
+        <module>mall-common-mybatis</module>
+        <module>mall-common-web</module>
+        <module>mall-common-security</module>
+        <module>mall-common-jwt</module>
+        <module>mall-common-redis</module>
+        <module>mall-common-session</module>
+        <module>mall-common-sensitive</module>
+        <module>mall-common-swagger</module>
+        <module>mall-common-excel</module>
+    </modules>
+
+
+</project>

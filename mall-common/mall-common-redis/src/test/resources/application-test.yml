@@ -1,0 +1,17 @@
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    database: 15
+
+mall:
+  redis:
+    enabled: true
+    null-value-ttl-seconds: 60
+    redisson:
+      enabled: true
+      host: 127.0.0.1
+      port: 6379
+      database: 15          # 用独立库，避免污染
+      pool-size: 8
+      min-idle-size: 2

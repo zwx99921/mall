@@ -1,0 +1,14 @@
+mall:
+  jwt:
+    enabled: true
+    admin:
+      secret: admin-secret-0123456789-0123456789-32bytes
+      expire: 7200000
+      refresh-expire: 604800000
+      issuer: mall-admin
+    member:
+      secret: member-secret-0123456789-0123456789-32bytes
+      expire: 604800000
+      refresh-expire: 2592000000
+      issuer: mall-member
+
