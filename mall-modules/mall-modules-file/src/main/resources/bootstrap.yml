@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: mall-modules-file
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: 192.168.1.10:8848
+        namespace: dev
+        group: DEFAULT_GROUP
+      config:
+        server-addr: 192.168.1.10:8848
+        namespace: dev
+        group: DEFAULT_GROUP
+        file-extension: yaml

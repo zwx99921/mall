@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.we</groupId>
+        <artifactId>mall-modules</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>mall-modules-admin</artifactId>
+
+    <packaging>jar</packaging>
+    <name>Mall Modules Admin</name>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+
+        <!-- ===================== Mall Common ===================== -->
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-sensitive</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-swagger</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-excel</artifactId>
+        </dependency>
+
+        <!-- ===================== Mall Api ===================== -->
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-api-admin</artifactId>
+        </dependency>
+
+        <!-- Mapstruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ===================== Boot & Cloud ===================== -->
+        <!-- Spring Boot Starter Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Starter Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Nacos 服务注册 -->
+        <!-- Spring Cloud Starter Alibaba Nacos Discovery -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- Nacos 配置中心 -->
+        <!-- Spring Cloud Starter Alibaba Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- Bootstrap -->
+        <!-- Spring Cloud Starter Bootstrap -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

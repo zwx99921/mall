@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.we.mall.modules.admin.mapper.UserMapper">
+
+    <select id="selectByUsername" resultType="com.we.mall.modules.admin.model.entity.UserEntity">
+        SELECT `id`,
+               `username`,
+               `password`,
+               `nickname`,
+               `avatar`,
+               `phone`,
+               `email`,
+               `status`,
+               `create_time`,
+               `update_time`
+        FROM `tbl_user`
+        WHERE username = #{username}
+    </select>
+
+</mapper>
