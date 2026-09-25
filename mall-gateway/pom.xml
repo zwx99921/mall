@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.we</groupId>
+        <artifactId>mall-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>mall-gateway</artifactId>
+    <packaging>jar</packaging>
+    <name>Mall Gateway</name>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Mall Common Core -->
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-core</artifactId>
+        </dependency>
+
+        <!-- Mall Common Redis -->
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-redis</artifactId>
+        </dependency>
+
+        <!-- Mall Common Session -->
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-session</artifactId>
+        </dependency>
+
+        <!-- Mall Common Jwt -->
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-jwt</artifactId>
+        </dependency>
+
+        <!-- Spring Cloud Starter Gateway -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!-- 负载均衡（lb:// 路由需要） -->
+        <!-- Spring Cloud Starter Loadbalancer -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <!-- Nacos 服务发现 -->
+        <!-- Spring Cloud Starter Alibaba Nacos Discovery -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- Nacos 配置中心 -->
+        <!-- Spring Cloud Starter Alibaba Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- Spring Cloud Starter Bootstrap -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
+        <!-- Springdoc Openapi Webflux UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-core</artifactId>
+        </dependency>
+
+        <!-- 测试 -->
+        <!-- Spring Boot Starter Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+
+</project>
