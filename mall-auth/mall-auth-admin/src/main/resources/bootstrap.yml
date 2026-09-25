@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: mall-auth-admin
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: 192.168.1.10:8848
+        group: DEFAULT_GROUP
+        namespace: dev
+      config:
+        server-addr: 192.168.1.10:8848
+        group: DEFAULT_GROUP
+        namespace: dev
+        file-extension: yaml
+        refresh-enabled: true
