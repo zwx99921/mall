@@ -3,6 +3,7 @@ package com.we.mall.gateway.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.we.mall.common.core.constant.HeaderConstants;
+import com.we.mall.common.session.context.SessionContext;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.common.session.model.SessionUser;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -21,19 +22,21 @@ public final class InternalHeaderUtils {
     private InternalHeaderUtils() {
     }
 
-    public static ServerHttpRequest buildRequest(ServerHttpRequest request, SessionInfo info) {
-        SessionUser user = info.getUser();
+    public static ServerHttpRequest buildRequest(ServerHttpRequest request, SessionContext context) {
+
+        SessionInfo sessionInfo = context.getSession();
+        SessionUser sessionUser = context.getUser();
 
         return request.mutate()
-                .header(HeaderConstants.HEADER_INTERNAL_USER_ID, String.valueOf(user.getUserId()))
-                .header(HeaderConstants.HEADER_INTERNAL_USERNAME, StrUtil.emptyIfNull(user.getUsername()))
-                .header(HeaderConstants.HEADER_INTERNAL_NICKNAME, StrUtil.emptyIfNull(user.getNickname()))
-                .header(HeaderConstants.HEADER_INTERNAL_TENANT_ID, user.getTenantId() == null ? "" : String.valueOf(user.getTenantId()))
-                .header(HeaderConstants.HEADER_INTERNAL_SESSION_ID, StrUtil.emptyIfNull(info.getSessionId()))
-                .header(HeaderConstants.HEADER_INTERNAL_CLIENT_TYPE, StrUtil.emptyIfNull(info.getClientType()))
-                .header(HeaderConstants.HEADER_INTERNAL_DEVICE_TYPE, StrUtil.emptyIfNull(info.getDeviceType()))
-                .header(HeaderConstants.HEADER_INTERNAL_ROLES, CollUtil.join(info.getRoles(), ","))
-                .header(HeaderConstants.HEADER_INTERNAL_PERMS, CollUtil.join(info.getPerms(), ","))
+                .header(HeaderConstants.HEADER_INTERNAL_SESSION_ID, StrUtil.emptyIfNull(sessionInfo.getSessionId()))
+                .header(HeaderConstants.HEADER_INTERNAL_CLIENT_TYPE, StrUtil.emptyIfNull(sessionInfo.getClientType()))
+                .header(HeaderConstants.HEADER_INTERNAL_DEVICE_TYPE, StrUtil.emptyIfNull(sessionInfo.getDeviceType()))
+
+                .header(HeaderConstants.HEADER_INTERNAL_USER_ID, String.valueOf(sessionUser.getUserId()))
+                .header(HeaderConstants.HEADER_INTERNAL_NICKNAME, StrUtil.emptyIfNull(sessionUser.getNickname()))
+                .header(HeaderConstants.HEADER_INTERNAL_USERNAME, StrUtil.emptyIfNull(sessionUser.getUsername()))
+                .header(HeaderConstants.HEADER_INTERNAL_ROLES, CollUtil.join(sessionUser.getRoles(), ","))
+                .header(HeaderConstants.HEADER_INTERNAL_PERMS, CollUtil.join(sessionUser.getPerms(), ","))
                 .build();
     }
 

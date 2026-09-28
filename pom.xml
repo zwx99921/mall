@@ -218,6 +218,11 @@
                 <artifactId>mall-common-excel</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.we</groupId>
+                <artifactId>mall-common-rpc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Mall Api -->
             <dependency>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.we.mall.modules.admin.mapper.UserRoleMapper">
+
+    <select id="selectUserIdsByRoleId" resultType="java.lang.Long">
+        SELECT `user_id`
+        FROM `tbl_user_role`
+        WHERE `role_id` = #{roleId}
+    </select>
+
+
+    <select id="selectUserIdsByMenuId" resultType="java.lang.Long">
+        SELECT DISTINCT ur.`user_id`
+        FROM `tbl_user_role` ur
+                 INNER JOIN `tbl_role_menu` rm ON ur.`role_id` = rm.`role_id`
+        WHERE rm.`menu_id` = #{menuId}
+    </select>
+
+</mapper>

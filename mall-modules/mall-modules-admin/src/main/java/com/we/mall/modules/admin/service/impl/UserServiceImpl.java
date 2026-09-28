@@ -26,6 +26,7 @@ import com.we.mall.modules.admin.model.request.UserUpdateRequest;
 import com.we.mall.modules.admin.model.response.UserInfoResponse;
 import com.we.mall.modules.admin.model.response.UserResponse;
 import com.we.mall.modules.admin.service.UserService;
+import com.we.mall.modules.admin.service.support.SessionRefreshSupport;
 import com.we.mall.modules.admin.service.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
 
+    private static final ClientType CLIENT = ClientType.ADMIN;
     private final UserRoleMapper userRoleMapper;
     private final RoleMapper roleMapper;
     private final MenuMapper menuMapper;
@@ -58,6 +60,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     private final PasswordEncoder passwordEncoder;
     private final SessionService sessionService;
     private final UserValidator userValidator;
+    private final SessionRefreshSupport sessionRefreshSupport;
 
     @Override
     public UserInfoResponse info() {
@@ -129,7 +132,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 .eq(UserEntity::getId, userId)
                 .set(UserEntity::getPassword, encoded);
         baseMapper.update(null, wrapper);
-        sessionService.kickAll(ClientType.ADMIN, userId);
+        sessionService.kickAll(CLIENT, userId);
     }
 
     @Override
@@ -162,7 +165,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             }
         }
 
-        sessionService.kickAll(ClientType.ADMIN, userId);
+        sessionRefreshSupport.refresh(userId);
     }
 
     @Override

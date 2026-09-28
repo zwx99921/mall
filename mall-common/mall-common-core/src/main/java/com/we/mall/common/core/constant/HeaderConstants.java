@@ -62,6 +62,11 @@ public final class HeaderConstants {
      */
     public static final String HEADER_INTERNAL_DEVICE_TYPE = INTERNAL_HEADER_PREFIX + "Device-Type";
 
+    /**
+     * 内部头：服务间调用凭证
+     */
+    public static final String HEADER_INTERNAL_SERVICE_TOKEN = INTERNAL_HEADER_PREFIX + "Service-Token";
+
     private HeaderConstants() {
     }
 

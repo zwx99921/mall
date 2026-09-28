@@ -43,7 +43,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final ClientType clientType = ClientType.ADMIN;
+    private static final ClientType CLIENT = ClientType.ADMIN;
 
     private final JwtServiceProvider jwtServiceProvider;
     private final CaptchaService captchaService;
@@ -89,12 +89,15 @@ public class AuthServiceImpl implements AuthService {
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
+                .roles(roles)
+                .perms(perms)
                 .build();
+
         // 生成 SessionId
-        String sessionId = sessionService.create(clientType, sessionUser, roles, perms, ip, userAgent, deviceType, deviceName);
+        String sessionId = sessionService.create(CLIENT, sessionUser, ip, userAgent, deviceType, deviceName);
 
         // 创建Token
-        JwtService jwtService = jwtServiceProvider.get(clientType.getUserType());
+        JwtService jwtService = jwtServiceProvider.get(CLIENT.getUserType());
         String accessToken = jwtService.createAccessToken(user.getUserId(), user.getUsername(), roles, perms, sessionId);
         String refreshToken = jwtService.createRefreshToken(user.getUserId(), user.getUsername(), sessionId);
 
@@ -108,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
     public TokenResponse refresh(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
 
-        JwtService jwtService = jwtServiceProvider.get(clientType.getUserType());
+        JwtService jwtService = jwtServiceProvider.get(CLIENT.getUserType());
 
         // 校验 refreshToken
         if (!jwtService.validate(refreshToken)) {
@@ -122,15 +125,20 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 查 session（必须还在）
-        SessionInfo info = sessionService.getAndRefresh(clientType, sessionId);
-        if (info == null || info.getUser() == null) {
+        SessionInfo info = sessionService.getAndRefresh(CLIENT, sessionId);
+        if (info == null) {
+            throw UnauthorizedException.of(ResultCode.SESSION_EXPIRED);
+        }
+
+        SessionUser user = sessionService.getSessionUser(CLIENT, info.getUserId());
+        if (user == null) {
             throw UnauthorizedException.of(ResultCode.SESSION_EXPIRED);
         }
 
         // 重新签发 accessToken
-        Long userId = info.getUser().getUserId();
-        String username = info.getUser().getUsername();
-        String newAccessToken = jwtService.createAccessToken(userId, username, info.getRoles(), info.getPerms(), sessionId);
+        Long userId = info.getUserId();
+        String username = user.getUsername();
+        String newAccessToken = jwtService.createAccessToken(userId, username, user.getRoles(), user.getPerms(), sessionId);
 
         log.info("刷新 token 成功: userId={}, sessionId={}", userId, sessionId);
 
@@ -144,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
             log.warn("登出失败: token 为空");
             return;
         }
-        JwtService jwtService = jwtServiceProvider.get(clientType.getUserType());
+        JwtService jwtService = jwtServiceProvider.get(CLIENT.getUserType());
         if (!jwtService.validate(token)) {
             log.warn("登出失败: token 无效");
             return;
@@ -155,7 +163,7 @@ public class AuthServiceImpl implements AuthService {
             log.warn("登出失败: sessionId 为空");
             return;
         }
-        sessionService.destroy(clientType, sessionId);
+        sessionService.destroy(CLIENT, sessionId);
 
         log.info("登出成功: sessionId={}", sessionId);
     }
@@ -165,7 +173,7 @@ public class AuthServiceImpl implements AuthService {
         if (userId == null) {
             return;
         }
-        sessionService.kickAll(clientType, userId);
+        sessionService.kickAll(CLIENT, userId);
         log.info("强制下线: userId={}", userId);
     }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * 会话用户信息
@@ -21,6 +22,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SessionUser implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * 用户 ID
@@ -38,8 +41,18 @@ public class SessionUser implements Serializable {
     private String nickname;
 
     /**
-     * 租户ID
+     * 头像
      */
-    private Long tenantId;
+    private String avatar;
+
+    /**
+     * 角色
+     */
+    private Set<String> roles;
+
+    /**
+     * 权限
+     */
+    private Set<String> perms;
 
 }

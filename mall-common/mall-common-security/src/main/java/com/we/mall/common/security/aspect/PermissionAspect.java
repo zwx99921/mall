@@ -4,8 +4,9 @@ import com.we.mall.common.core.exception.ForbiddenException;
 import com.we.mall.common.security.annotation.RequiresLogin;
 import com.we.mall.common.security.annotation.RequiresPermission;
 import com.we.mall.common.security.annotation.RequiresRole;
-import com.we.mall.common.security.context.SecurityContext;
 import com.we.mall.common.security.enums.Logical;
+import com.we.mall.common.security.util.SecurityUtils;
+import com.we.mall.common.session.model.SessionInfo;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.util.CollectionUtils;
@@ -25,12 +26,12 @@ public class PermissionAspect {
 
     @Before("@annotation(requiresLogin) || @within(requiresLogin)")
     public void checkLogin(RequiresLogin requiresLogin) {
-        SecurityContext.requireLogin();
+        SessionInfo sessionInfo = SecurityUtils.requireSession();
     }
 
     @Before("@annotation(requiresRole)")
     public void checkRole(RequiresRole requiresRole) {
-        Set<String> roles = SecurityContext.getRoles();
+        Set<String> roles = SecurityUtils.getRoles();
         if (notMatch(roles, requiresRole.value(), requiresRole.logical())) {
             throw ForbiddenException.of("角色不足");
         }
@@ -38,7 +39,7 @@ public class PermissionAspect {
 
     @Before("@annotation(requiresPermission)")
     public void checkPermission(RequiresPermission requiresPermission) {
-        Set<String> perms = SecurityContext.getPerms();
+        Set<String> perms = SecurityUtils.getPerms();
         if (notMatch(perms, requiresPermission.value(), requiresPermission.logical())) {
             throw ForbiddenException.of("权限不足");
         }

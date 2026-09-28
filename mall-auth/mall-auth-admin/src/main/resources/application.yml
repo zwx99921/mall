@@ -47,6 +47,8 @@ mall:
       expire: 7200000               # 2小时
       refresh-expire: 604800000     # 7 天
       issuer: mall-admin
+  rpc:
+    service-token: mall-internal-secret-2026
   # redis
   redis:
     enabled: true

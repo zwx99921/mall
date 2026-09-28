@@ -6,6 +6,7 @@ import com.we.mall.common.security.util.SecurityUtils;
 import com.we.mall.modules.admin.convert.MenuConvert;
 import com.we.mall.modules.admin.mapper.MenuMapper;
 import com.we.mall.modules.admin.mapper.RoleMenuMapper;
+import com.we.mall.modules.admin.mapper.UserRoleMapper;
 import com.we.mall.modules.admin.model.entity.MenuEntity;
 import com.we.mall.modules.admin.model.entity.RoleMenuEntity;
 import com.we.mall.modules.admin.model.request.MenuCreateRequest;
@@ -13,6 +14,7 @@ import com.we.mall.modules.admin.model.request.MenuUpdateRequest;
 import com.we.mall.modules.admin.model.response.MenuResponse;
 import com.we.mall.modules.admin.model.response.MenuTreeResponse;
 import com.we.mall.modules.admin.service.MenuService;
+import com.we.mall.modules.admin.service.support.SessionRefreshSupport;
 import com.we.mall.modules.admin.service.validator.MenuValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +39,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
 
     private final MenuConvert menuConvert;
     private final RoleMenuMapper roleMenuMapper;
+    private final UserRoleMapper userRoleMapper;
     private final MenuValidator menuValidator;
+    private final SessionRefreshSupport sessionRefreshSupport;
 
     @Override
     public List<MenuTreeResponse> routes() {
@@ -77,6 +81,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
         menuValidator.checkParentValid(menuId, request.getParentId());
 
         baseMapper.update(null, request.toUpdateWrapper().eq(MenuEntity::getId, menuId));
+
+        // 状态或 perms 变了 → 刷新受影响用户
+        if (request.getStatus() != null || request.getPerms() != null) {
+            List<Long> userIds = userRoleMapper.selectUserIdsByMenuId(menuId);
+            sessionRefreshSupport.refresh(userIds);
+        }
     }
 
     @Override
@@ -85,13 +95,17 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
         menuValidator.checkExists(menuId);
         menuValidator.checkCanDelete(menuId);
 
-        // 删菜单
-        baseMapper.deleteById(menuId);
+        // 先查受影响的用户
+        List<Long> userIds = userRoleMapper.selectUserIdsByMenuId(menuId);
 
-        // 删角色-菜单关联
+        // 删菜单 + 删角色菜单关联
+        baseMapper.deleteById(menuId);
         roleMenuMapper.delete(
                 new LambdaQueryWrapper<RoleMenuEntity>()
                         .eq(RoleMenuEntity::getMenuId, menuId));
+
+        // 刷新
+        sessionRefreshSupport.refresh(userIds);
     }
 
     /**

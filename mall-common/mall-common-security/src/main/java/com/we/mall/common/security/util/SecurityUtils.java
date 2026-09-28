@@ -1,21 +1,16 @@
 package com.we.mall.common.security.util;
 
-import com.we.mall.common.security.context.SecurityContext;
+import com.we.mall.common.core.exception.UnauthorizedException;
+import com.we.mall.common.security.context.SecurityContextHolder;
+import com.we.mall.common.session.enums.ClientType;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.common.session.model.SessionUser;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
- * 安全工具（业务入口）
- * <p>
- * 业务代码只依赖本类，不直接依赖 SecurityContext / SessionContext。
- * <p>
- * 语义约定：
- * <ul>
- *     <li>{@code getXxx()}：未登录返回 null / 空集合</li>
- *     <li>{@code requireXxx()}：未登录抛 401</li>
- * </ul>
+ * 安全工具类
  *
  * @author we
  * @date 2026-09-21
@@ -26,105 +21,117 @@ public final class SecurityUtils {
     private SecurityUtils() {
     }
 
-    // ==================== 会话 ====================
+    // ==================== SessionInfo ====================
 
-    /**
-     * 当前会话，未登录返回 null
-     */
     public static SessionInfo getSession() {
-        return SecurityContext.getSession();
+        return SecurityContextHolder.getSession();
     }
 
-    /**
-     * 当前会话 ID，未登录返回 null
-     */
-    public static String getSessionId() {
-        SessionInfo info = SecurityContext.getSession();
-        return info == null ? null : info.getSessionId();
-    }
-
-    // ==================== 用户 ====================
-
-    /**
-     * 当前用户，未登录返回 null
-     */
-    public static SessionUser getUser() {
-        return SecurityContext.getUser();
-    }
-
-    /**
-     * 当前用户，未登录抛 401
-     */
-    public static SessionUser requireUser() {
-        return SecurityContext.requireUser();
-    }
-
-    /**
-     * 当前用户 ID，未登录返回 null
-     */
-    public static Long getUserId() {
-        return SecurityContext.getUserId();
-    }
-
-    /**
-     * 当前用户 ID，未登录抛 401
-     */
-    public static Long requireUserId() {
-        return SecurityContext.requireUserId();
-    }
-
-    /**
-     * 当前用户名，未登录返回 null
-     */
-    public static String getUsername() {
-        return SecurityContext.getUsername();
-    }
-
-    /**
-     * 当前昵称，未登录返回 null
-     */
-    public static String getNickname() {
-        return SecurityContext.getNickname();
-    }
-
-    // ==================== 角色 / 权限 ====================
-
-    /**
-     * 当前角色，未登录返回空 Set
-     */
-    public static Set<String> getRoles() {
-        return SecurityContext.getRoles();
-    }
-
-    /**
-     * 当前权限，未登录返回空 Set
-     */
-    public static Set<String> getPerms() {
-        return SecurityContext.getPerms();
-    }
-
-    // ==================== 状态判断 ====================
-
-    /**
-     * 是否登录
-     */
     public static boolean isLogin() {
-        return SecurityContext.isLogin();
+        return getSession() != null;
     }
 
-    /**
-     * 是否管理端
-     */
+    public static String getSessionId() {
+        SessionInfo s = getSession();
+        return s == null ? null : s.getSessionId();
+    }
+
+    public static String getClientType() {
+        SessionInfo s = getSession();
+        return s == null ? null : s.getClientType();
+    }
+
+    public static String getDeviceType() {
+        SessionInfo s = getSession();
+        return s == null ? null : s.getDeviceType();
+    }
+
+    // ==================== SessionUser ====================
+
+    public static SessionUser getLoginUser() {
+        return SecurityContextHolder.getUser();
+    }
+
+    public static Long getUserId() {
+        SessionUser u = getLoginUser();
+        return u == null ? null : u.getUserId();
+    }
+
+    public static Long requireUserId() {
+        Long userId = getUserId();
+        if (userId == null) {
+            throw UnauthorizedException.notLogin();
+        }
+        return userId;
+    }
+
+    public static SessionUser requireUser() {
+        SessionUser u = getLoginUser();
+        if (u == null) {
+            throw UnauthorizedException.notLogin();
+        }
+        return u;
+    }
+
+    public static SessionInfo requireSession() {
+        SessionInfo s = getSession();
+        if (s == null) {
+            throw UnauthorizedException.notLogin();
+        }
+        return s;
+    }
+
+    public static String getUsername() {
+        SessionUser u = getLoginUser();
+        return u == null ? null : u.getUsername();
+    }
+
+    public static String requireUsername() {
+        String username = getUsername();
+        if (username == null) {
+            throw UnauthorizedException.notLogin();
+        }
+        return username;
+    }
+
+    public static String getNickname() {
+        SessionUser u = getLoginUser();
+        return u == null ? null : u.getNickname();
+    }
+
+    public static String getAvatar() {
+        SessionUser u = getLoginUser();
+        return u == null ? null : u.getAvatar();
+    }
+
+    // ==================== Auth ====================
+
+    public static Set<String> getRoles() {
+        SessionUser u = getLoginUser();
+        return u == null || u.getRoles() == null ? Collections.emptySet() : u.getRoles();
+    }
+
+    public static Set<String> getPerms() {
+        SessionUser u = getLoginUser();
+        return u == null || u.getPerms() == null ? Collections.emptySet() : u.getPerms();
+    }
+
+    public static boolean hasRole(String role) {
+        return getRoles().contains(role);
+    }
+
+    public static boolean hasPermission(String perm) {
+        return getPerms().contains(perm);
+    }
+
+    // ==================== 端类型 ====================
+
     public static boolean isAdmin() {
-        return SecurityContext.isAdmin();
+        return ClientType.ADMIN.getCode().equalsIgnoreCase(getClientType());
     }
 
-    /**
-     * 是否 C 端
-     */
     public static boolean isMember() {
-        return SecurityContext.isMember();
+        return ClientType.MEMBER.getCode().equalsIgnoreCase(getClientType());
     }
-
 
 }

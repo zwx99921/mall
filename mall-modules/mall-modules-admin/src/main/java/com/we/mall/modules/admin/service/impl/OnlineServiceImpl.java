@@ -43,11 +43,6 @@ public class OnlineServiceImpl implements OnlineService {
     private static final ClientType CLIENT = ClientType.ADMIN;
 
     /**
-     * 排除索引 key 的判断标记：session:{client}:user:
-     */
-    private static final String USER_INDEX_MARK = ":user:";
-
-    /**
      * scan 每次扫描建议数量
      */
     private static final long SCAN_COUNT = 1000L;
@@ -66,10 +61,9 @@ public class OnlineServiceImpl implements OnlineService {
 
         // 2. 按 userId 分组
         Map<Long, List<SessionInfo>> grouped = all.stream()
-                .filter(info -> info.getUser() != null
-                        && info.getUser().getUserId() != null)
+                .filter(info -> info.getUserId() != null)
                 .collect(Collectors.groupingBy(
-                        info -> info.getUser().getUserId(),
+                        SessionInfo::getUserId,
                         LinkedHashMap::new,
                         Collectors.toList()));
 
@@ -107,7 +101,6 @@ public class OnlineServiceImpl implements OnlineService {
             records = rows.subList((int) from, to);
         }
 
-        // 6. 计算总页数
         long pages = (total + pageSize - 1) / pageSize;
 
         return PageResult.of(pages, total, pageNum, pageSize, records);
@@ -121,8 +114,10 @@ public class OnlineServiceImpl implements OnlineService {
         if (list == null || list.isEmpty()) {
             return Collections.emptyList();
         }
+        // 查一次 SessionUser，复用
+        SessionUser user = sessionService.getSessionUser(CLIENT, userId);
         return list.stream()
-                .map(this::toSessionResponse)
+                .map(info -> toSessionResponse(info, user))
                 .collect(Collectors.toList());
     }
 
@@ -130,13 +125,11 @@ public class OnlineServiceImpl implements OnlineService {
 
     @Override
     public void kick(Long userId) {
-        // 不能踢自己
         Long currentUserId = SecurityUtils.getUserId();
         if (userId != null && userId.equals(currentUserId)) {
             throw BusinessException.of(ResultCode.CANNOT_KICK_SELF);
         }
 
-        // 校验用户是否在线
         List<SessionInfo> list = sessionService.listByUser(CLIENT, userId);
         if (list == null || list.isEmpty()) {
             throw BusinessException.of(ResultCode.ONLINE_USER_NOT_FOUND);
@@ -157,7 +150,6 @@ public class OnlineServiceImpl implements OnlineService {
             throw BusinessException.of(ResultCode.ONLINE_SESSION_NOT_FOUND);
         }
 
-        // 不能踢自己的当前 session
         String currentSessionId = SecurityUtils.getSessionId();
         if (sessionId.equals(currentSessionId)) {
             throw BusinessException.of(ResultCode.CANNOT_KICK_SELF);
@@ -170,23 +162,16 @@ public class OnlineServiceImpl implements OnlineService {
     // ==================== 私有辅助 ====================
 
     /**
-     * 扫描全部在线 session，过滤索引 key
+     * 扫描全部在线 session
      */
     private List<SessionInfo> listAllSessions() {
-        String pattern = SessionKeyBuilder.clientPattern(sessionProperties, CLIENT.getCode());
+        String pattern = SessionKeyBuilder.clientSessionPattern(sessionProperties, CLIENT.getCode());
         Set<String> keys = redisKeyOpsService.scan(pattern, SCAN_COUNT);
         if (keys == null || keys.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 过滤掉 user:{userId}:{device} 索引 key
-        List<String> sessionKeys = keys.stream()
-                .filter(k -> !k.contains(USER_INDEX_MARK))
-                .collect(Collectors.toList());
-        if (sessionKeys.isEmpty()) {
-            return Collections.emptyList();
-        }
-
+        List<String> sessionKeys = new ArrayList<>(keys);
         List<SessionInfo> infos = redisStringOpsService.multiGet(sessionKeys, SessionInfo.class);
         if (infos == null || infos.isEmpty()) {
             return Collections.emptyList();
@@ -200,8 +185,8 @@ public class OnlineServiceImpl implements OnlineService {
         OnlineUserResponse row = new OnlineUserResponse();
         row.setUserId(userId);
 
-        SessionInfo first = list.get(0);
-        SessionUser user = first.getUser();
+        // 从 SessionUser 拿 username / nickname
+        SessionUser user = sessionService.getSessionUser(CLIENT, userId);
         if (user != null) {
             row.setUsername(user.getUsername());
             row.setNickname(user.getNickname());
@@ -209,7 +194,6 @@ public class OnlineServiceImpl implements OnlineService {
 
         row.setSessionCount(list.size());
 
-        // 设备类型去重
         List<String> devices = list.stream()
                 .map(SessionInfo::getDeviceType)
                 .filter(Objects::nonNull)
@@ -217,7 +201,6 @@ public class OnlineServiceImpl implements OnlineService {
                 .collect(Collectors.toList());
         row.setDeviceTypes(devices);
 
-        // 最近活跃时间
         LocalDateTime latest = list.stream()
                 .map(SessionInfo::getLastAccessTime)
                 .filter(Objects::nonNull)
@@ -228,7 +211,7 @@ public class OnlineServiceImpl implements OnlineService {
         return row;
     }
 
-    private OnlineSessionResponse toSessionResponse(SessionInfo info) {
+    private OnlineSessionResponse toSessionResponse(SessionInfo info, SessionUser user) {
         OnlineSessionResponse r = new OnlineSessionResponse();
         r.setSessionId(info.getSessionId());
         r.setClientType(info.getClientType());
@@ -240,9 +223,8 @@ public class OnlineServiceImpl implements OnlineService {
         r.setLastAccessTime(info.getLastAccessTime());
         r.setExpireTime(info.getExpireTime());
 
-        SessionUser user = info.getUser();
+        r.setUserId(info.getUserId());
         if (user != null) {
-            r.setUserId(user.getUserId());
             r.setUsername(user.getUsername());
             r.setNickname(user.getNickname());
         }

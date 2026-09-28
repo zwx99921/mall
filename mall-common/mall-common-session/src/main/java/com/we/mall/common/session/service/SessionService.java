@@ -29,7 +29,6 @@ public interface SessionService {
      * @return sessionId
      */
     String create(ClientType clientType, SessionUser sessionUser,
-                  Set<String> roles, Set<String> perms,
                   String loginIp, String userAgent, String deviceType, String deviceName);
 
     /**
@@ -71,5 +70,39 @@ public interface SessionService {
      * 查某端该用户所有设备类型
      */
     Set<String> listDeviceTypes(ClientType clientType, Long userId);
+
+    // ==================== SessionUser ====================
+
+    /**
+     * 获取会话用户
+     */
+    SessionUser getSessionUser(ClientType clientType, Long userId);
+
+    /**
+     * 保存会话用户
+     */
+    void saveSessionUser(ClientType clientType, Long userId, SessionUser sessionUser);
+
+    /**
+     * 移除会话用户
+     */
+    void removeSessionUser(ClientType clientType, Long userId);
+
+    /**
+     * 刷新 SessionUser 的 roles / perms
+     * <p>
+     * 保留原 TTL。SessionUser 不存在时跳过。
+     *
+     * @param clientType 端类型
+     * @param userId     用户ID
+     * @param roles      新角色
+     * @param perms      新权限
+     */
+    void refreshAuth(ClientType clientType, Long userId, Set<String> roles, Set<String> perms);
+
+    /**
+     * 刷新用户所有在线会话的 SessionUser（保留原 TTL）
+     */
+    void refreshSessionUser(ClientType clientType, Long userId, SessionUser sessionUser);
 
 }

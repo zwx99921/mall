@@ -56,6 +56,9 @@ mall:
     enabled: true
     gateway-mode: true    # 不强制登录，具体接口用 @RequiresLogin
     required: false        # 网关模式：从 X-Internal-* header 还原
+  # 远程服务调用校验
+  rpc:
+    service-token: mall-internal-secret-2026
   # Redis
   redis:
     enabled: true

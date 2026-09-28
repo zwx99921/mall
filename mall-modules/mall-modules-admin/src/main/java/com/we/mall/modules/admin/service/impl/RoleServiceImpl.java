@@ -7,6 +7,7 @@ import com.we.mall.common.mybatis.result.PageResult;
 import com.we.mall.modules.admin.convert.RoleConvert;
 import com.we.mall.modules.admin.mapper.RoleMapper;
 import com.we.mall.modules.admin.mapper.RoleMenuMapper;
+import com.we.mall.modules.admin.mapper.UserRoleMapper;
 import com.we.mall.modules.admin.model.entity.RoleEntity;
 import com.we.mall.modules.admin.model.entity.RoleMenuEntity;
 import com.we.mall.modules.admin.model.request.RoleCreateRequest;
@@ -14,6 +15,7 @@ import com.we.mall.modules.admin.model.request.RolePageRequest;
 import com.we.mall.modules.admin.model.request.RoleUpdateRequest;
 import com.we.mall.modules.admin.model.response.RoleResponse;
 import com.we.mall.modules.admin.service.RoleService;
+import com.we.mall.modules.admin.service.support.SessionRefreshSupport;
 import com.we.mall.modules.admin.service.validator.RoleValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +39,10 @@ import java.util.stream.Collectors;
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> implements RoleService {
 
     private final RoleMenuMapper roleMenuMapper;
+    private final UserRoleMapper userRoleMapper;
     private final RoleConvert roleConvert;
     private final RoleValidator roleValidator;
+    private final SessionRefreshSupport sessionRefreshSupport;
 
     @Override
     public PageResult<RoleResponse> page(RolePageRequest request) {
@@ -67,14 +71,27 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     public void update(Long roleId, RoleUpdateRequest request) {
         roleValidator.checkExists(roleId);
         baseMapper.update(null, request.toUpdateWrapper().eq(RoleEntity::getId, roleId));
+
+        if (request.getStatus() != null) {
+            List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
+            sessionRefreshSupport.refresh(userIds);
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long roleId) {
         roleValidator.checkExists(roleId);
+        // 先查受影响的用户
+        List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
+
         baseMapper.deleteById(roleId);
-        roleMenuMapper.delete(new LambdaQueryWrapper<RoleMenuEntity>().eq(RoleMenuEntity::getRoleId, roleId));
+        roleMenuMapper.delete(
+                new LambdaQueryWrapper<RoleMenuEntity>()
+                        .eq(RoleMenuEntity::getRoleId, roleId));
+
+        // 刷新
+        sessionRefreshSupport.refresh(userIds);
     }
 
     @Override
@@ -111,5 +128,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
                 roleMenuMapper.insert(entity);
             }
         }
+
+        List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
+        sessionRefreshSupport.refresh(userIds);
     }
 }

@@ -5,8 +5,10 @@ import com.we.mall.common.core.enums.UserType;
 import com.we.mall.common.jwt.provider.JwtServiceProvider;
 import com.we.mall.common.jwt.service.JwtService;
 import com.we.mall.common.jwt.util.JwtUtils;
+import com.we.mall.common.session.context.SessionContext;
 import com.we.mall.common.session.enums.ClientType;
 import com.we.mall.common.session.model.SessionInfo;
+import com.we.mall.common.session.model.SessionUser;
 import com.we.mall.common.session.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,7 @@ public class GatewayAuthenticate {
     /**
      * 从请求中认证，成功返回 SessionInfo，失败返回 null
      */
-    public SessionInfo authenticate(ServerHttpRequest request) {
+    public SessionContext authenticate(ServerHttpRequest request) {
         String path = request.getPath().value();
 
         // 拿 token
@@ -74,13 +76,24 @@ public class GatewayAuthenticate {
         }
 
         // 查 session
-        SessionInfo info = sessionService.getAndRefresh(clientType, sessionId);
-        if (info == null || info.getUser() == null) {
+        SessionInfo sessionInfo = sessionService.getAndRefresh(clientType, sessionId);
+        if (sessionInfo == null) {
             log.debug("auth fail: session not found, path={}", path);
             return null;
         }
 
-        return info;
+        // 7. 查 sessionUser
+        SessionUser sessionUser = sessionService.getSessionUser(clientType, sessionInfo.getUserId());
+        if (sessionUser == null) {
+            log.debug("auth fail: sessionUser not found, path={}", path);
+            return null;
+        }
+
+        // 8. 组装
+        return SessionContext.builder()
+                .session(sessionInfo)
+                .user(sessionUser)
+                .build();
     }
 
 }

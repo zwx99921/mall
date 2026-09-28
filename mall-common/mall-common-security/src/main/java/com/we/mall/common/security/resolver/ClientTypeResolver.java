@@ -1,5 +1,7 @@
 package com.we.mall.common.security.resolver;
 
+import cn.hutool.core.util.StrUtil;
+import com.we.mall.common.core.constant.HeaderConstants;
 import com.we.mall.common.session.enums.ClientType;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,11 +13,18 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2026-09-21
  * @description
  */
-public interface ClientTypeResolver {
+public class ClientTypeResolver {
 
     /**
      * 从请求中解析端类型
      */
-    ClientType resolve(HttpServletRequest request);
+    public ClientType resolve(HttpServletRequest request) {
+        String header = request.getHeader(HeaderConstants.HEADER_CLIENT_TYPE);
+
+        if (StrUtil.isNotBlank(header)) {
+            return ClientType.of(header);
+        }
+        return null;
+    }
 
 }

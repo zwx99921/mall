@@ -44,4 +44,11 @@ public class SecurityProperties {
      */
     private List<String> excludePaths = new ArrayList<>(Arrays.asList("/inner/**", "/error"));
 
+    /**
+     * 服务间调用凭证
+     * <p>
+     * 用于 /inner/** 接口的服务身份校验。
+     * 生产环境建议放配置中心。
+     */
+    private String serviceToken;
 }

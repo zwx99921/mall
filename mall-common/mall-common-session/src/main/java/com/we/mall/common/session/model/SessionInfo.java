@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 /**
  * 会话元信息
@@ -21,6 +20,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SessionInfo implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * sessionId
@@ -43,9 +44,9 @@ public class SessionInfo implements Serializable {
     private String deviceName;
 
     /**
-     * 用户信息
+     * 用户Id，存快照做关联
      */
-    private SessionUser user;
+    private Long userId;
 
     /**
      * 登录 IP
@@ -71,15 +72,5 @@ public class SessionInfo implements Serializable {
      * 过期时间
      */
     private LocalDateTime expireTime;
-
-    /**
-     * 角色
-     */
-    private Set<String> roles;
-
-    /**
-     * 权限
-     */
-    private Set<String> perms;
 
 }

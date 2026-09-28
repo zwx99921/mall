@@ -24,6 +24,7 @@
         <module>mall-common-sensitive</module>
         <module>mall-common-swagger</module>
         <module>mall-common-excel</module>
+        <module>mall-common-rpc</module>
     </modules>
 
 

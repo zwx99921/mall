@@ -7,7 +7,6 @@ import com.we.mall.common.security.authenticator.TokenAuthenticator;
 import com.we.mall.common.security.interceptor.AuthInterceptor;
 import com.we.mall.common.security.properties.SecurityProperties;
 import com.we.mall.common.security.resolver.ClientTypeResolver;
-import com.we.mall.common.security.resolver.impl.DefaultClientTypeResolver;
 import com.we.mall.common.session.service.SessionService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -57,7 +56,7 @@ public class SecurityAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ClientTypeResolver clientTypeResolver() {
-        return new DefaultClientTypeResolver();
+        return new ClientTypeResolver();
     }
 
     /**
@@ -83,11 +82,11 @@ public class SecurityAutoConfiguration {
      */
     @Configuration
     @ConditionalOnClass(WebMvcConfigurer.class)
-    public static class WebMvcConfig implements WebMvcConfigurer {
+    public static class AuthConfig implements WebMvcConfigurer {
         private final TokenAuthenticator tokenAuthenticator;
         private final SecurityProperties securityProperties;
 
-        public WebMvcConfig(TokenAuthenticator tokenAuthenticator, SecurityProperties securityProperties) {
+        public AuthConfig(TokenAuthenticator tokenAuthenticator, SecurityProperties securityProperties) {
             this.tokenAuthenticator = tokenAuthenticator;
             this.securityProperties = securityProperties;
         }
