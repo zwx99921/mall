@@ -8,7 +8,6 @@ import com.we.mall.auth.admin.model.response.TokenResponse;
 import com.we.mall.auth.admin.service.AuthService;
 import com.we.mall.common.core.constant.HeaderConstants;
 import com.we.mall.common.core.result.R;
-import com.we.mall.common.security.annotation.RequiresPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -61,16 +60,6 @@ public class AuthController {
     @PostMapping("/logout")
     public R<Void> logout(@RequestHeader(HeaderConstants.HEADER_AUTHORIZATION) String authorization) {
         authService.logout(authorization);
-        return R.ok();
-    }
-
-    /**
-     * 踢人
-     */
-    @PostMapping("/kick/{userId}")
-    @RequiresPermission("admin:user:kick")
-    public R<Void> kickUser(@PathVariable Long userId) {
-        authService.kickUser(userId);
         return R.ok();
     }
 

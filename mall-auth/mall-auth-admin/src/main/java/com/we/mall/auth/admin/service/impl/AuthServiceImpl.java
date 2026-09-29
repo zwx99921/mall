@@ -171,13 +171,4 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("登出成功: sessionId={}", sessionId);
     }
-
-    @Override
-    public void kickUser(Long userId) {
-        if (userId == null) {
-            return;
-        }
-        sessionService.kickAll(CLIENT, userId);
-        log.info("强制下线: userId={}", userId);
-    }
 }

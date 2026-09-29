@@ -28,9 +28,4 @@ public interface AuthService {
      */
     void logout(String authorization);
 
-    /**
-     * 踢用户下线
-     */
-    void kickUser(Long userId);
-
 }

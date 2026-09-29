@@ -16,20 +16,37 @@ import nl.basjes.parse.useragent.UserAgentAnalyzer;
  */
 public final class UserAgentUtils {
 
-    private static final UserAgentAnalyzer UAA = UserAgentAnalyzer
-            .newBuilder()
-            .hideMatcherLoadStats()
-            .withCache(1000)
-            .withField("DeviceClass")
-            .withField("OperatingSystemName")
-            .withField("OperatingSystemNameVersion")
-            .withField("OperatingSystemNameVersion")
-            .withField("AgentNameVersion")
-            .withField("AgentName")
-            .withField("AgentVersion")
-            .build();
+    private static volatile UserAgentAnalyzer UAA;
 
     private UserAgentUtils() {
+    }
+
+    /**
+     * 启动时预加载
+     */
+    public static void init() {
+        getUaa();
+    }
+
+    private static void getUaa() {
+        if (UAA == null) {
+            synchronized (UserAgentUtils.class) {
+                if (UAA == null) {
+                    UAA = UserAgentAnalyzer
+                            .newBuilder()
+                            .hideMatcherLoadStats()
+                            .withCache(1000)
+                            .withField("DeviceClass")
+                            .withField("OperatingSystemName")
+                            .withField("OperatingSystemNameVersion")
+                            .withField("OperatingSystemNameVersion")
+                            .withField("AgentNameVersion")
+                            .withField("AgentName")
+                            .withField("AgentVersion")
+                            .build();
+                }
+            }
+        }
     }
 
     /**

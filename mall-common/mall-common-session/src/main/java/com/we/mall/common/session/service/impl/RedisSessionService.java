@@ -48,7 +48,7 @@ public class RedisSessionService implements SessionService {
 
         // 设备类型校验
         if (!cfg.getDeviceTypes().contains(deviceType) && !cfg.isAllowUnknownDevice()) {
-            throw BusinessException.of(ResultCode.CLIENT_TYPE_NOT_SUPPORT, "");
+            throw BusinessException.of(ResultCode.CLIENT_TYPE_NOT_SUPPORT);
         }
 
         // 同端互踢
@@ -57,8 +57,8 @@ public class RedisSessionService implements SessionService {
         }
 
         // 超量踢最早的
-        if (cfg.getMaxPerDevice() > 0) {
-            enforceMaxPerDevice(clientType.getCode(), sessionUser.getUserId(), deviceType.name(), cfg.getMaxPerDevice());
+        if (cfg.getMaxSessions() > 0) {
+            enforceMaxSessions(clientType.getCode(), sessionUser.getUserId(), cfg.getMaxSessions());
         }
 
         // 创建
@@ -241,21 +241,27 @@ public class RedisSessionService implements SessionService {
     /**
      * 超出每端上限时，踢掉最早的会话
      */
-    private void enforceMaxPerDevice(String clientType, Long userId, String device, int max) {
-        List<String> ids = sessionIndexStore.listByUserAndDevice(clientType, userId, device);
-        if (ids.size() < max) {
+    private void enforceMaxSessions(String clientType, Long userId, int max) {
+        List<String> allIds = sessionIndexStore.listByUser(clientType, userId);
+        if (allIds.size() < max) {
             return;
         }
-        ids.sort(Comparator.comparing(id -> {
+        // 按创建时间升序，踢最早的
+        allIds.sort(Comparator.comparing(id -> {
             SessionInfo i = sessionInfoStore.get(clientType, id);
             return i == null ? LocalDateTime.MIN : i.getCreateTime();
         }));
-        int needKick = ids.size() - max + 1;
+        int needKick = allIds.size() - max + 1;
         for (int i = 0; i < needKick; i++) {
-            sessionInfoStore.remove(clientType, ids.get(i));
-            sessionIndexStore.remove(clientType, userId, device, ids.get(i));
+            String sessionId = allIds.get(i);
+            SessionInfo info = sessionInfoStore.get(clientType, sessionId);
+            if (info != null) {
+                sessionInfoStore.remove(clientType, sessionId);
+                sessionIndexStore.remove(clientType, userId, info.getDeviceType(), sessionId);
+            }
         }
-        log.info("enforceMaxPerDevice kicked {} sessions [{}] user={} device={}", needKick, clientType, userId, device);
+        log.info("enforceMaxSessions kicked {} sessions [{}] user={}",
+                needKick, clientType, userId);
     }
 
 }

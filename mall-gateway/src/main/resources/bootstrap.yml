@@ -1,17 +1,33 @@
 spring:
   application:
     name: mall-gateway
+  profiles:
+    active: dev
   cloud:
     nacos:
       username: nacos
       password: nacos
       discovery:
         server-addr: 192.168.1.10:8848
-        namespace: dev
+        namespace: ${spring.profiles.active}
         group: DEFAULT_GROUP
       config:
         server-addr: 192.168.1.10:8848
-        namespace: dev
+        namespace: ${spring.profiles.active}
         group: DEFAULT_GROUP
         file-extension: yaml
         refresh-enabled: true
+        shared-configs:
+          - data-id: mall-common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: mall-redis.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+        extension-configs:
+          - data-id: mall-session.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: mall-jwt.yaml
+            group: DEFAULT_GROUP
+            refresh: true

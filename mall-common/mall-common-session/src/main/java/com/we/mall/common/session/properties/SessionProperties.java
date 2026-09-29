@@ -84,9 +84,11 @@ public class SessionProperties {
         private boolean sameDeviceKick = true;
 
         /**
-         * 每端最大在线数（0 不限）
+         * 最大在线 session 数（0 不限）
+         * <p>
+         * 同一用户在同一端的最大在线 session 总数。
          */
-        private int maxPerDevice = 0;
+        private int maxSessions = 0;
 
         /**
          * 是否允许未知设备

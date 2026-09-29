@@ -42,10 +42,6 @@
         </dependency>
         <dependency>
             <groupId>com.we</groupId>
-            <artifactId>mall-common-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.we</groupId>
             <artifactId>mall-common-swagger</artifactId>
         </dependency>
         <dependency>
@@ -60,6 +56,12 @@
         </dependency>
 
         <!-- ===================== Boot & Cloud ===================== -->
+        <!-- Spring Security Crypto -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
         <!-- Spring Boot Starter Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
