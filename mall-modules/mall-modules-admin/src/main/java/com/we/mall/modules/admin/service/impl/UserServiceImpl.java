@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -138,12 +139,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public Set<Long> getRoleIds(Long userId) {
         userValidator.checkExists(userId);
-        List<UserRoleEntity> list = userRoleMapper.selectList(
-                new LambdaQueryWrapper<UserRoleEntity>()
-                        .eq(UserRoleEntity::getUserId, userId));
-        return list.stream()
-                .map(UserRoleEntity::getRoleId)
-                .collect(Collectors.toSet());
+        return new HashSet<>(userRoleMapper.selectRoleIdsByUserId(userId));
     }
 
     @Override
@@ -152,17 +148,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userValidator.checkExists(userId);
 
         // 删旧的
-        userRoleMapper.delete(
-                new LambdaQueryWrapper<UserRoleEntity>()
-                        .eq(UserRoleEntity::getUserId, userId));
+        userRoleMapper.deleteByUserId(userId);
         // 加新的
         if (roleIds != null && !roleIds.isEmpty()) {
-            for (Long roleId : roleIds) {
-                UserRoleEntity entity = new UserRoleEntity();
-                entity.setUserId(userId);
-                entity.setRoleId(roleId);
-                userRoleMapper.insert(entity);
-            }
+            List<UserRoleEntity> list = roleIds.stream()
+                    .map(roleId -> {
+                        UserRoleEntity entity = new UserRoleEntity();
+                        entity.setUserId(userId);
+                        entity.setRoleId(roleId);
+                        return entity;
+                    })
+                    .collect(Collectors.toList());
+            userRoleMapper.batchInsert(list);
         }
 
         sessionRefreshSupport.refresh(userId);

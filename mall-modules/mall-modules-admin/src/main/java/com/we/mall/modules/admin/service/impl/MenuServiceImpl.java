@@ -1,6 +1,5 @@
 package com.we.mall.modules.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.we.mall.common.security.util.SecurityUtils;
 import com.we.mall.modules.admin.convert.MenuConvert;
@@ -8,7 +7,6 @@ import com.we.mall.modules.admin.mapper.MenuMapper;
 import com.we.mall.modules.admin.mapper.RoleMenuMapper;
 import com.we.mall.modules.admin.mapper.UserRoleMapper;
 import com.we.mall.modules.admin.model.entity.MenuEntity;
-import com.we.mall.modules.admin.model.entity.RoleMenuEntity;
 import com.we.mall.modules.admin.model.request.MenuCreateRequest;
 import com.we.mall.modules.admin.model.request.MenuUpdateRequest;
 import com.we.mall.modules.admin.model.response.MenuResponse;
@@ -100,9 +98,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, MenuEntity> impleme
 
         // 删菜单 + 删角色菜单关联
         baseMapper.deleteById(menuId);
-        roleMenuMapper.delete(
-                new LambdaQueryWrapper<RoleMenuEntity>()
-                        .eq(RoleMenuEntity::getMenuId, menuId));
+        roleMenuMapper.deleteByMenuId(menuId);
 
         // 刷新
         sessionRefreshSupport.refresh(userIds);

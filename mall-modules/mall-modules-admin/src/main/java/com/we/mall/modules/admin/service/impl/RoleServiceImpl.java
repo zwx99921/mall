@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -86,9 +87,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
         List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
 
         baseMapper.deleteById(roleId);
-        roleMenuMapper.delete(
-                new LambdaQueryWrapper<RoleMenuEntity>()
-                        .eq(RoleMenuEntity::getRoleId, roleId));
+        roleMenuMapper.deleteByRoleId(roleId);
 
         // 刷新
         sessionRefreshSupport.refresh(userIds);
@@ -105,10 +104,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
 
     @Override
     public Set<Long> getMenuIds(Long roleId) {
-        List<RoleMenuEntity> list = roleMenuMapper.selectList(
-                new LambdaQueryWrapper<RoleMenuEntity>()
-                        .eq(RoleMenuEntity::getRoleId, roleId));
-        return list.stream().map(RoleMenuEntity::getMenuId).collect(Collectors.toSet());
+        return new HashSet<>(roleMenuMapper.selectMenuIdsByRoleId(roleId));
     }
 
     @Override
@@ -116,17 +112,18 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     public void assignMenus(Long roleId, Set<Long> menuIds) {
         roleValidator.checkExists(roleId);
 
-        roleMenuMapper.delete(
-                new LambdaQueryWrapper<RoleMenuEntity>()
-                        .eq(RoleMenuEntity::getRoleId, roleId));
+        roleMenuMapper.deleteByRoleId(roleId);
 
         if (menuIds != null && !menuIds.isEmpty()) {
-            for (Long menuId : menuIds) {
-                RoleMenuEntity entity = new RoleMenuEntity();
-                entity.setRoleId(roleId);
-                entity.setMenuId(menuId);
-                roleMenuMapper.insert(entity);
-            }
+            List<RoleMenuEntity> list = menuIds.stream()
+                    .map(menuId -> {
+                        RoleMenuEntity entity = new RoleMenuEntity();
+                        entity.setRoleId(roleId);
+                        entity.setMenuId(menuId);
+                        return entity;
+                    })
+                    .collect(Collectors.toList());
+            roleMenuMapper.batchInsert(list);
         }
 
         List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);

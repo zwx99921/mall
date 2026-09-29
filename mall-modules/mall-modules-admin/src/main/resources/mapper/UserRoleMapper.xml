@@ -3,18 +3,44 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.we.mall.modules.admin.mapper.UserRoleMapper">
 
+
+    <!-- 按用户查关联的角色ID -->
+    <select id="selectRoleIdsByUserId" resultType="java.lang.Long">
+        SELECT `role_id`
+        FROM `tbl_user_role`
+        WHERE `user_id` = #{userId}
+    </select>
+
+    <!-- 按角色查关联的用户ID -->
     <select id="selectUserIdsByRoleId" resultType="java.lang.Long">
         SELECT `user_id`
         FROM `tbl_user_role`
         WHERE `role_id` = #{roleId}
     </select>
 
-
+    <!-- 按菜单查受影响的用户ID：用户 → 角色 → 菜单 -->
     <select id="selectUserIdsByMenuId" resultType="java.lang.Long">
         SELECT DISTINCT ur.`user_id`
         FROM `tbl_user_role` ur
                  INNER JOIN `tbl_role_menu` rm ON ur.`role_id` = rm.`role_id`
         WHERE rm.`menu_id` = #{menuId}
     </select>
+
+    <!-- 按用户删除关联 -->
+    <delete id="deleteByUserId">
+        DELETE
+        FROM `tbl_user_role`
+        WHERE `user_id` = #{userId}
+    </delete>
+
+    <!-- 批量新增关联 -->
+    <insert id="batchInsert">
+        INSERT INTO `tbl_user_role` (`user_id`, `role_id`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId}, #{item.roleId})
+        </foreach>
+    </insert>
+
 
 </mapper>
