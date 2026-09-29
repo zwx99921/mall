@@ -1,6 +1,6 @@
 package com.we.mall.common.jwt.config;
 
-import com.we.mall.common.core.enums.UserType;
+import com.we.mall.common.core.enums.ClientType;
 import com.we.mall.common.jwt.properties.JwtProperties;
 import com.we.mall.common.jwt.provider.JwtServiceProvider;
 import com.we.mall.common.jwt.service.JwtService;
@@ -41,7 +41,7 @@ public class JwtAutoConfiguration {
     @ConditionalOnMissingBean(name = "adminJwtService")
     @ConditionalOnProperty(prefix = "mall.jwt.admin", name = "secret")
     public JwtService adminJwtService(JwtProperties jwtProperties) {
-        return new JwtServiceImpl(jwtProperties, UserType.ADMIN);
+        return new JwtServiceImpl(jwtProperties, ClientType.ADMIN);
     }
 
     /**
@@ -53,15 +53,15 @@ public class JwtAutoConfiguration {
     @ConditionalOnMissingBean(name = "memberJwtService")
     @ConditionalOnProperty(prefix = "mall.jwt.member", name = "secret")
     public JwtService memberJwtService(JwtProperties jwtProperties) {
-        return new JwtServiceImpl(jwtProperties, UserType.MEMBER);
+        return new JwtServiceImpl(jwtProperties, ClientType.MEMBER);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public JwtServiceProvider jwtServiceProvider(List<JwtService> jwtServices) {
-        Map<UserType, JwtService> map = new EnumMap<>(UserType.class);
+        Map<ClientType, JwtService> map = new EnumMap<>(ClientType.class);
         for (JwtService service : jwtServices) {
-            UserType type = service.getUserType();
+            ClientType type = service.getUserType();
             if (type == null) {
                 log.warn("JwtService {} 未返回 UserType，已跳过", service.getClass());
                 continue;

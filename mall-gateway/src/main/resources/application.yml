@@ -72,12 +72,12 @@ mall:
     clients:
       admin:
         key-prefix: "mall:session:admin:"
-        device-types: [ PC ]
+        device-types: [ DESKTOP, PHONE ]
         same-device-kick: true
         max-per-device: 1
       member:
         key-prefix: "mall:session:member:"
-        device-types: [ PC, H5, APP, MINI ]
+        device-types: [ DESKTOP, PHONE, TABLET, MOBILE ]
         same-device-kick: true
         max-per-device: 0
   jwt:

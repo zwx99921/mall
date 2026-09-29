@@ -1,6 +1,6 @@
 package com.we.mall.common.swagger.config;
 
-import com.we.mall.common.core.constant.JwtConstants;
+import com.we.mall.common.core.constant.HeaderConstants;
 import com.we.mall.common.swagger.converter.ModelConverterImpl;
 import com.we.mall.common.swagger.properties.SwaggerProperties;
 import io.swagger.v3.core.converter.ModelConverter;
@@ -45,17 +45,17 @@ public class SwaggerAutoConfiguration {
         // 认证方式（Bearer Token）
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.HTTP)
-                .scheme(JwtConstants.TOKEN_SCHEME)
-                .bearerFormat(JwtConstants.JWT)
+                .scheme("bearer")
+                .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
-                .name(JwtConstants.HEADER_AUTH);   // Authorization
+                .name(HeaderConstants.HEADER_AUTHORIZATION);   // Authorization
 
         // 全局认证
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(JwtConstants.HEADER_AUTH);
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(HeaderConstants.HEADER_AUTHORIZATION);
 
         return new OpenAPI()
                 .info(info)
-                .components(new Components().addSecuritySchemes(JwtConstants.HEADER_AUTH, securityScheme))
+                .components(new Components().addSecuritySchemes(HeaderConstants.HEADER_AUTHORIZATION, securityScheme))
                 .addSecurityItem(securityRequirement);
     }
 

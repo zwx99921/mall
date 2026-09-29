@@ -1,5 +1,6 @@
 package com.we.mall.common.session.properties;
 
+import com.we.mall.common.core.enums.DeviceType;
 import com.we.mall.common.core.enums.ResultCode;
 import com.we.mall.common.core.exception.SystemException;
 import lombok.Data;
@@ -75,7 +76,7 @@ public class SessionProperties {
         /**
          * 支持的设备类型
          */
-        private List<String> deviceTypes = Arrays.asList("PC", "H5", "APP");
+        private List<DeviceType> deviceTypes = Arrays.asList(DeviceType.DESKTOP, DeviceType.PHONE, DeviceType.TABLET, DeviceType.MOBILE);
 
         /**
          * 同端是否互踢

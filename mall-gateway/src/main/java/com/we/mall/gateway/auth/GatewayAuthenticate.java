@@ -1,14 +1,11 @@
 package com.we.mall.gateway.auth;
 
-import com.we.mall.common.core.constant.JwtConstants;
-import com.we.mall.common.core.enums.UserType;
+import com.we.mall.common.core.constant.HeaderConstants;
+import com.we.mall.common.core.enums.ClientType;
 import com.we.mall.common.jwt.provider.JwtServiceProvider;
 import com.we.mall.common.jwt.service.JwtService;
 import com.we.mall.common.jwt.util.JwtUtils;
-import com.we.mall.common.session.context.SessionContext;
-import com.we.mall.common.session.enums.ClientType;
 import com.we.mall.common.session.model.SessionInfo;
-import com.we.mall.common.session.model.SessionUser;
 import com.we.mall.common.session.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,64 +33,48 @@ public class GatewayAuthenticate {
     private final SessionService sessionService;
 
     /**
-     * 从请求中认证，成功返回 SessionInfo，失败返回 null
+     * 从请求中认证
      */
-    public SessionContext authenticate(ServerHttpRequest request) {
+    public SessionInfo authenticate(ServerHttpRequest request) {
         String path = request.getPath().value();
 
-        // 拿 token
-        String token = JwtUtils.parseBearer(request.getHeaders().getFirst(JwtConstants.HEADER_AUTH));
+        // Token
+        String token = JwtUtils.parseBearer(request.getHeaders().getFirst(HeaderConstants.HEADER_AUTHORIZATION));
         if (!StringUtils.hasText(token)) {
             log.debug("auth fail: no token, path={}", path);
             return null;
         }
 
-        UserType userType = JwtUtils.extractUserType(token);
-        if (userType == null) {
-            log.debug("auth fail: unknown user type, path={}", path);
-            return null;
-        }
-
-        // 解析端类型
-        ClientType clientType = ClientType.fromUserType(userType);
+        // ClientType
+        ClientType clientType = JwtUtils.extractClientType(token);
         if (clientType == null) {
             log.debug("auth fail: unknown client type, path={}", path);
             return null;
         }
 
-        // 校验 token
-        JwtService jwtService = jwtServiceProvider.get(userType);
+        // 根据 Token 用户类型 验 token
+        JwtService jwtService = jwtServiceProvider.get(clientType);
         if (jwtService == null || !jwtService.validate(token)) {
             log.debug("auth fail: invalid token, path={}", path);
             return null;
         }
 
-        // 拿 sessionId
+        // SessionId
         String sessionId = jwtService.getSessionId(token);
         if (!StringUtils.hasText(sessionId)) {
             log.debug("auth fail: no sessionId, path={}", path);
             return null;
         }
 
-        // 查 session
+        // SessionInfo
         SessionInfo sessionInfo = sessionService.getAndRefresh(clientType, sessionId);
         if (sessionInfo == null) {
             log.debug("auth fail: session not found, path={}", path);
             return null;
         }
 
-        // 7. 查 sessionUser
-        SessionUser sessionUser = sessionService.getSessionUser(clientType, sessionInfo.getUserId());
-        if (sessionUser == null) {
-            log.debug("auth fail: sessionUser not found, path={}", path);
-            return null;
-        }
-
-        // 8. 组装
-        return SessionContext.builder()
-                .session(sessionInfo)
-                .user(sessionUser)
-                .build();
+        // 组装
+        return sessionInfo;
     }
 
 }

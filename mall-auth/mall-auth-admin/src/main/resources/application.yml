@@ -1,4 +1,9 @@
 server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   port: 9000
   compression:
     enabled: true
@@ -62,13 +67,13 @@ mall:
   # Session
   session:
     enabled: true
-    timeout-seconds: 604800             # 2小时
+    timeout-seconds: 604800
     sliding-expiration: true
     session-id-length: 32
     clients:
       admin:
         key-prefix: "mall:session:admin:"
-        device-types: [ PC ]
+        device-types: [ DESKTOP,PHONE ]
         same-device-kick: true
         max-per-device: 1
         allow-unknown-device: false

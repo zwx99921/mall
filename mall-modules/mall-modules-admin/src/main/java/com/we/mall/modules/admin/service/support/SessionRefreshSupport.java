@@ -1,6 +1,6 @@
 package com.we.mall.modules.admin.service.support;
 
-import com.we.mall.common.session.enums.ClientType;
+import com.we.mall.common.core.enums.ClientType;
 import com.we.mall.common.session.service.SessionService;
 import com.we.mall.modules.admin.mapper.MenuMapper;
 import com.we.mall.modules.admin.mapper.RoleMapper;

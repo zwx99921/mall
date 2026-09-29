@@ -1,4 +1,4 @@
-package com.we.mall.common.core.constant;
+package com.we.mall.common.jwt.constant;
 
 /**
  * JWT 常量
@@ -9,21 +9,19 @@ package com.we.mall.common.core.constant;
  */
 public final class JwtConstants {
 
-    public static final String JWT = "JWT";
     /**
-     * Token 前缀（无空格，小写）—— 用于 OpenAPI
+     * 客户端类型：ADMIN / MEMBER
      */
-    public static final String TOKEN_SCHEME = "bearer";
-    /**
-     * 用户类型：ADMIN / MEMBER
-     */
-    public static final String CLAIM_USER_TYPE = "userType";
+    public static final String CLAIM_CLIENT_TYPE = "clientType";
 
     // ==================== Claim Key ====================
     /**
      * 用户名
      */
     public static final String CLAIM_USERNAME = "username";
+
+    private JwtConstants() {
+    }
     /**
      * 角色
      */
@@ -40,17 +38,10 @@ public final class JwtConstants {
      * 会话 ID
      */
     public static final String CLAIM_SESSION_ID = "sessionId";
-    /**
-     * 认证头
-     */
-    public static final String HEADER_AUTH = "Authorization";
-
     // ==================== Header ====================
     /**
      * Bearer 前缀
      */
     public static final String TOKEN_PREFIX = "Bearer ";
-    private JwtConstants() {
-    }
 
 }

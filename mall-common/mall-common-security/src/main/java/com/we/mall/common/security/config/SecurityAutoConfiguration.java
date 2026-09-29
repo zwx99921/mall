@@ -3,10 +3,10 @@ package com.we.mall.common.security.config;
 import com.we.mall.common.jwt.provider.JwtServiceProvider;
 import com.we.mall.common.jwt.util.JwtUtils;
 import com.we.mall.common.security.aspect.PermissionAspect;
+import com.we.mall.common.security.assembler.SecurityContextAssembler;
 import com.we.mall.common.security.authenticator.TokenAuthenticator;
 import com.we.mall.common.security.interceptor.AuthInterceptor;
 import com.we.mall.common.security.properties.SecurityProperties;
-import com.we.mall.common.security.resolver.ClientTypeResolver;
 import com.we.mall.common.session.service.SessionService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -53,12 +53,6 @@ public class SecurityAutoConfiguration {
         return new PermissionAspect();
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public ClientTypeResolver clientTypeResolver() {
-        return new ClientTypeResolver();
-    }
-
     /**
      * Token 认证器
      * <p>
@@ -69,12 +63,15 @@ public class SecurityAutoConfiguration {
     @ConditionalOnClass(JwtUtils.class)
     public TokenAuthenticator tokenAuthenticator(
             ObjectProvider<SessionService> sessionServiceProvider,
-            ObjectProvider<JwtServiceProvider> jwtServiceProvider,
-            ClientTypeResolver clientTypeResolver) {
+            ObjectProvider<JwtServiceProvider> jwtServiceProvider) {
         return new TokenAuthenticator(
                 sessionServiceProvider.getIfAvailable(),
-                jwtServiceProvider.getIfAvailable(),
-                clientTypeResolver);
+                jwtServiceProvider.getIfAvailable());
+    }
+
+    @Bean
+    public SecurityContextAssembler securityContextAssembler(ObjectProvider<SessionService> sessionServiceProvider) {
+        return new SecurityContextAssembler(sessionServiceProvider.getIfAvailable());
     }
 
     /**
@@ -84,10 +81,14 @@ public class SecurityAutoConfiguration {
     @ConditionalOnClass(WebMvcConfigurer.class)
     public static class AuthConfig implements WebMvcConfigurer {
         private final TokenAuthenticator tokenAuthenticator;
+        private final SecurityContextAssembler securityContextAssembler;
         private final SecurityProperties securityProperties;
 
-        public AuthConfig(TokenAuthenticator tokenAuthenticator, SecurityProperties securityProperties) {
+        public AuthConfig(TokenAuthenticator tokenAuthenticator,
+                          SecurityContextAssembler securityContextAssembler,
+                          SecurityProperties securityProperties) {
             this.tokenAuthenticator = tokenAuthenticator;
+            this.securityContextAssembler = securityContextAssembler;
             this.securityProperties = securityProperties;
         }
 
@@ -95,6 +96,7 @@ public class SecurityAutoConfiguration {
         public void addInterceptors(InterceptorRegistry registry) {
             AuthInterceptor interceptor = new AuthInterceptor(
                     tokenAuthenticator,
+                    securityContextAssembler,
                     securityProperties.isRequired(),
                     securityProperties.isGatewayMode());
 

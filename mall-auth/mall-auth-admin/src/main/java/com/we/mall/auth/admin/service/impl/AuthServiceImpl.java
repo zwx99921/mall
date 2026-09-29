@@ -5,22 +5,22 @@ import com.we.mall.api.admin.dto.UserDTO;
 import com.we.mall.auth.admin.model.request.LoginRequest;
 import com.we.mall.auth.admin.model.request.RefreshTokenRequest;
 import com.we.mall.auth.admin.model.response.TokenResponse;
+import com.we.mall.auth.admin.resolver.DeviceNameResolver;
+import com.we.mall.auth.admin.resolver.DeviceTypeResolver;
 import com.we.mall.auth.admin.service.AuthService;
 import com.we.mall.auth.admin.service.CaptchaService;
 import com.we.mall.auth.admin.service.PasswordService;
-import com.we.mall.common.core.constant.HeaderConstants;
+import com.we.mall.common.core.enums.ClientType;
+import com.we.mall.common.core.enums.DeviceType;
 import com.we.mall.common.core.enums.ResultCode;
 import com.we.mall.common.core.exception.BusinessException;
 import com.we.mall.common.core.exception.UnauthorizedException;
 import com.we.mall.common.jwt.provider.JwtServiceProvider;
 import com.we.mall.common.jwt.service.JwtService;
 import com.we.mall.common.jwt.util.JwtUtils;
-import com.we.mall.common.session.enums.ClientType;
-import com.we.mall.common.session.enums.DeviceType;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.common.session.model.SessionUser;
 import com.we.mall.common.session.service.SessionService;
-import com.we.mall.common.web.util.HeaderUtils;
 import com.we.mall.common.web.util.IpUtils;
 import com.we.mall.common.web.util.ServletUtils;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +50,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordService passwordService;
     private final SessionService sessionService;
     private final UserFeignClient userFeignClient;
+    private final DeviceTypeResolver deviceTypeResolver;
+    private final DeviceNameResolver deviceNameResolver;
 
     @Override
     public TokenResponse login(LoginRequest request) {
@@ -79,8 +81,10 @@ public class AuthServiceImpl implements AuthService {
 
         String ip = IpUtils.getIpAddr();
         String userAgent = ServletUtils.getHeader(HttpHeaders.USER_AGENT);
-        String deviceType = HeaderUtils.resolve(HeaderConstants.HEADER_CLIENT_TYPE, DeviceType.PC.name());
-        String deviceName = HeaderUtils.resolve(HeaderConstants.HEADER_DEVICE_NAME, null);
+
+        DeviceType deviceType = deviceTypeResolver.resolve(userAgent);
+        String deviceName = deviceNameResolver.resolve(userAgent);
+
         Set<String> roles = user.getRoles();
         Set<String> perms = user.getPerms();
 
@@ -97,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
         String sessionId = sessionService.create(CLIENT, sessionUser, ip, userAgent, deviceType, deviceName);
 
         // 创建Token
-        JwtService jwtService = jwtServiceProvider.get(CLIENT.getUserType());
+        JwtService jwtService = jwtServiceProvider.get(CLIENT);
         String accessToken = jwtService.createAccessToken(user.getUserId(), user.getUsername(), roles, perms, sessionId);
         String refreshToken = jwtService.createRefreshToken(user.getUserId(), user.getUsername(), sessionId);
 
@@ -111,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
     public TokenResponse refresh(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
 
-        JwtService jwtService = jwtServiceProvider.get(CLIENT.getUserType());
+        JwtService jwtService = jwtServiceProvider.get(CLIENT);
 
         // 校验 refreshToken
         if (!jwtService.validate(refreshToken)) {
@@ -152,7 +156,7 @@ public class AuthServiceImpl implements AuthService {
             log.warn("登出失败: token 为空");
             return;
         }
-        JwtService jwtService = jwtServiceProvider.get(CLIENT.getUserType());
+        JwtService jwtService = jwtServiceProvider.get(CLIENT);
         if (!jwtService.validate(token)) {
             log.warn("登出失败: token 无效");
             return;

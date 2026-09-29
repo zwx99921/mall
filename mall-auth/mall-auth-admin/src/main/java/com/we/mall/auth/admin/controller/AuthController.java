@@ -6,7 +6,7 @@ import com.we.mall.auth.admin.model.request.LoginRequest;
 import com.we.mall.auth.admin.model.request.RefreshTokenRequest;
 import com.we.mall.auth.admin.model.response.TokenResponse;
 import com.we.mall.auth.admin.service.AuthService;
-import com.we.mall.common.core.constant.JwtConstants;
+import com.we.mall.common.core.constant.HeaderConstants;
 import com.we.mall.common.core.result.R;
 import com.we.mall.common.security.annotation.RequiresPermission;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +59,7 @@ public class AuthController {
      */
     @Operation(summary = "登出", description = "管理员退出登录")
     @PostMapping("/logout")
-    public R<Void> logout(@RequestHeader(JwtConstants.HEADER_AUTH) String authorization) {
+    public R<Void> logout(@RequestHeader(HeaderConstants.HEADER_AUTHORIZATION) String authorization) {
         authService.logout(authorization);
         return R.ok();
     }

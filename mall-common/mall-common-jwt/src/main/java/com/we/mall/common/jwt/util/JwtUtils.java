@@ -1,8 +1,8 @@
 package com.we.mall.common.jwt.util;
 
 import cn.hutool.json.JSONUtil;
-import com.we.mall.common.core.constant.JwtConstants;
-import com.we.mall.common.core.enums.UserType;
+import com.we.mall.common.core.enums.ClientType;
+import com.we.mall.common.jwt.constant.JwtConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -42,15 +42,15 @@ public final class JwtUtils {
     /**
      * 从 token payload 提取 userType（不校验签名）
      */
-    public static UserType extractUserType(String token) {
+    public static ClientType extractClientType(String token) {
         try {
             String[] parts = token.split("\\.");
             if (parts.length < 2) {
                 return null;
             }
             String payload = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-            String userType = JSONUtil.parseObj(payload).getStr(JwtConstants.CLAIM_USER_TYPE);
-            return UserType.of(userType);
+            String clientType = JSONUtil.parseObj(payload).getStr(JwtConstants.CLAIM_CLIENT_TYPE);
+            return ClientType.of(clientType);
         } catch (Exception e) {
             log.debug("extract userType fail: {}", e.getMessage());
             return null;

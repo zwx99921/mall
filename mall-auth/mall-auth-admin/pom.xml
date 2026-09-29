@@ -19,6 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <kaptcha.version>2.3.2</kaptcha.version>
+        <yauaa.version>7.32.0</yauaa.version>
     </properties>
 
     <dependencies>
@@ -122,6 +123,14 @@
             <groupId>com.github.penggle</groupId>
             <artifactId>kaptcha</artifactId>
             <version>${kaptcha.version}</version>
+        </dependency>
+
+        <!-- UserAgent解析 -->
+        <!-- Yauaa -->
+        <dependency>
+            <groupId>nl.basjes.parse.useragent</groupId>
+            <artifactId>yauaa</artifactId>
+            <version>${yauaa.version}</version>
         </dependency>
 
     </dependencies>

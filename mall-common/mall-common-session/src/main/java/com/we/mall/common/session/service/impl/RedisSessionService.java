@@ -1,8 +1,9 @@
 package com.we.mall.common.session.service.impl;
 
+import com.we.mall.common.core.enums.ClientType;
+import com.we.mall.common.core.enums.DeviceType;
 import com.we.mall.common.core.enums.ResultCode;
 import com.we.mall.common.core.exception.BusinessException;
-import com.we.mall.common.session.enums.ClientType;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.common.session.model.SessionUser;
 import com.we.mall.common.session.properties.SessionProperties;
@@ -41,23 +42,23 @@ public class RedisSessionService implements SessionService {
 
     @Override
     public String create(ClientType clientType, SessionUser sessionUser,
-                         String loginIp, String userAgent, String deviceType, String deviceName) {
+                         String loginIp, String userAgent, DeviceType deviceType, String deviceName) {
 
         SessionProperties.ClientConfig cfg = sessionProperties.getClient(clientType.getCode());
 
         // 设备类型校验
         if (!cfg.getDeviceTypes().contains(deviceType) && !cfg.isAllowUnknownDevice()) {
-            throw BusinessException.of(ResultCode.PARAM_FORMAT_ERROR, "[" + clientType + "] 不支持的设备类型: " + deviceType);
+            throw BusinessException.of(ResultCode.CLIENT_TYPE_NOT_SUPPORT, "");
         }
 
         // 同端互踢
         if (cfg.isSameDeviceKick()) {
-            kickByUserAndDevice(clientType, sessionUser.getUserId(), deviceType);
+            kickByUserAndDevice(clientType, sessionUser.getUserId(), deviceType.name());
         }
 
         // 超量踢最早的
         if (cfg.getMaxPerDevice() > 0) {
-            enforceMaxPerDevice(clientType.getCode(), sessionUser.getUserId(), deviceType, cfg.getMaxPerDevice());
+            enforceMaxPerDevice(clientType.getCode(), sessionUser.getUserId(), deviceType.name(), cfg.getMaxPerDevice());
         }
 
         // 创建
@@ -69,7 +70,7 @@ public class RedisSessionService implements SessionService {
         SessionInfo info = SessionInfo.builder()
                 .sessionId(sessionId)
                 .clientType(clientType.getCode())
-                .deviceType(deviceType)
+                .deviceType(deviceType.name())
                 .deviceName(deviceName)
                 .userId(sessionUser.getUserId())
                 .loginIp(loginIp)
@@ -81,7 +82,7 @@ public class RedisSessionService implements SessionService {
         sessionInfoStore.save(info, ttl);
 
         // 2. 索引
-        sessionIndexStore.add(clientType.getCode(), sessionUser.getUserId(), deviceType, sessionId);
+        sessionIndexStore.add(clientType.getCode(), sessionUser.getUserId(), deviceType.name(), sessionId);
 
         // 3. 用户
         sessionUserStore.save(clientType.getCode(), sessionUser.getUserId(), sessionUser, ttl);

@@ -31,6 +31,7 @@ public enum ResultCode {
     METHOD_NOT_ALLOWED(11001, "请求方法不支持"),
     REQUEST_TOO_LARGE(11002, "请求体过大"),
     CONTENT_TYPE_ERROR(11003, "Content-Type 不支持"),
+    CLIENT_TYPE_NOT_SUPPORT(11004, "当前设备不支持访问"),
 
     // 12xxx 资源
     NOT_FOUND(12001, "资源不存在"),

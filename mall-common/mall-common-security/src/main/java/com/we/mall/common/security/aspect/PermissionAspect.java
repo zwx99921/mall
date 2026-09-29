@@ -6,7 +6,6 @@ import com.we.mall.common.security.annotation.RequiresPermission;
 import com.we.mall.common.security.annotation.RequiresRole;
 import com.we.mall.common.security.enums.Logical;
 import com.we.mall.common.security.util.SecurityUtils;
-import com.we.mall.common.session.model.SessionInfo;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.util.CollectionUtils;
@@ -26,7 +25,7 @@ public class PermissionAspect {
 
     @Before("@annotation(requiresLogin) || @within(requiresLogin)")
     public void checkLogin(RequiresLogin requiresLogin) {
-        SessionInfo sessionInfo = SecurityUtils.requireSession();
+        SecurityUtils.requireLogin();
     }
 
     @Before("@annotation(requiresRole)")

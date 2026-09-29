@@ -1,13 +1,11 @@
 package com.we.mall.common.security.authenticator;
 
-import com.we.mall.common.core.constant.JwtConstants;
-import com.we.mall.common.core.enums.UserType;
+import com.we.mall.common.core.constant.HeaderConstants;
+import com.we.mall.common.core.enums.ClientType;
 import com.we.mall.common.jwt.provider.JwtServiceProvider;
 import com.we.mall.common.jwt.service.JwtService;
 import com.we.mall.common.jwt.util.JwtUtils;
-import com.we.mall.common.security.resolver.ClientTypeResolver;
-import com.we.mall.common.session.context.SessionContext;
-import com.we.mall.common.session.enums.ClientType;
+import com.we.mall.common.security.context.SecurityContext;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.common.session.model.SessionUser;
 import com.we.mall.common.session.service.SessionService;
@@ -17,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Token 认证器
  * <p>
- * 从请求 header 的 token 解析出 {@link SessionContext}。
+ * 从请求 header 的 token 解析出 {@link SecurityContext}。
  *
  * @author we
  * @date 2026-09-21
@@ -27,14 +25,11 @@ public class TokenAuthenticator {
 
     private final SessionService sessionService;
     private final JwtServiceProvider jwtServiceProvider;
-    private final ClientTypeResolver clientTypeResolver;
 
     public TokenAuthenticator(SessionService sessionService,
-                              JwtServiceProvider jwtServiceProvider,
-                              ClientTypeResolver clientTypeResolver) {
+                              JwtServiceProvider jwtServiceProvider) {
         this.sessionService = sessionService;
         this.jwtServiceProvider = jwtServiceProvider;
-        this.clientTypeResolver = clientTypeResolver;
     }
 
     /**
@@ -43,59 +38,60 @@ public class TokenAuthenticator {
      * @param request 请求
      * @return SessionInfo 或 null
      */
-    public SessionContext authenticate(HttpServletRequest request) {
+    public SecurityContext authenticate(HttpServletRequest request) {
 
-        if (sessionService == null || jwtServiceProvider == null || clientTypeResolver == null) {
+        if (sessionService == null || jwtServiceProvider == null) {
             return null;
         }
 
-        // 拿 token
-        String token = JwtUtils.parseBearer(request.getHeader(JwtConstants.HEADER_AUTH));
+        // Token
+        String token = JwtUtils.parseBearer(request.getHeader(HeaderConstants.HEADER_AUTHORIZATION));
         if (token == null) {
             return null;
         }
 
-        // 从token 中解析 UserType，然后推出 ClientType
-        UserType userType = JwtUtils.extractUserType(token);
-        if (userType == null) {
-            return null;
-        }
-
-        ClientType clientType = ClientType.fromUserType(userType);
+        // ClientType
+        ClientType clientType = JwtUtils.extractClientType(token);
         if (clientType == null) {
             return null;
         }
-
-        // 按端拿 JwtService
-        JwtService jwtService = jwtServiceProvider.get(userType);
+        // JwtService
+        JwtService jwtService = jwtServiceProvider.get(clientType);
         if (jwtService == null) {
             return null;
         }
 
-        // 校验 token
+        // 校验 Token
         if (!jwtService.validate(token)) {
             return null;
         }
 
-        // 拿 sessionId
+        // SessionId
         String sessionId = jwtService.getSessionId(token);
         if (sessionId == null) {
             return null;
         }
 
-        // 查 session（会刷新 TTL）
+        // SessionInfo（会刷新 TTL）
         SessionInfo session = sessionService.getAndRefresh(clientType, sessionId);
         if (session == null) {
             return null;
         }
 
-        // 查 SessionUser
+        // SessionUser
         SessionUser user = sessionService.getSessionUser(clientType, session.getUserId());
 
-        // 组装 SecurityContext
-        return SessionContext.builder()
-                .session(session)
-                .user(user)
+        // SecurityContext（扁平）
+        return SecurityContext.builder()
+                .sessionId(session.getSessionId())
+                .clientType(session.getClientType())
+                .deviceType(session.getDeviceType())
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
+                .roles(user.getRoles())
+                .perms(user.getPerms())
                 .build();
     }
 

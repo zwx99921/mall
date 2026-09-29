@@ -1,6 +1,6 @@
 package com.we.mall.common.jwt.provider;
 
-import com.we.mall.common.core.enums.UserType;
+import com.we.mall.common.core.enums.ClientType;
 import com.we.mall.common.jwt.exception.TokenException;
 import com.we.mall.common.jwt.service.JwtService;
 
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * JwtService 提供者
  * <p>
- * 按 {@link UserType} 获取对应的 JwtService，避免上层到处 if-else。
+ * 按 {@link ClientType} 获取对应的 JwtService，避免上层到处 if-else。
  * <p>
  * 设计要点：
  * <ul>
@@ -28,13 +28,13 @@ import java.util.Set;
  */
 public class JwtServiceProvider {
 
-    private final Map<UserType, JwtService> serviceMap;
+    private final Map<ClientType, JwtService> serviceMap;
 
     /**
      * @param services 端 → JwtService 映射；不可为 null
      */
-    public JwtServiceProvider(Map<UserType, JwtService> services) {
-        Map<UserType, JwtService> map = new EnumMap<>(UserType.class);
+    public JwtServiceProvider(Map<ClientType, JwtService> services) {
+        Map<ClientType, JwtService> map = new EnumMap<>(ClientType.class);
         if (services != null) {
             services.forEach((type, service) -> {
                 if (type != null && service != null) {
@@ -48,7 +48,7 @@ public class JwtServiceProvider {
     /**
      * 按用户类型拿 JwtService，不存在返回 null
      */
-    public JwtService get(UserType userType) {
+    public JwtService get(ClientType userType) {
         return userType == null ? null : serviceMap.get(userType);
     }
 
@@ -57,7 +57,7 @@ public class JwtServiceProvider {
      *
      * @throws TokenException 该端未配置 JwtService
      */
-    public JwtService require(UserType userType) {
+    public JwtService require(ClientType userType) {
         JwtService service = get(userType);
         if (service == null) {
             throw TokenException.invalid("端未配置 JwtService: " + userType);
@@ -68,14 +68,14 @@ public class JwtServiceProvider {
     /**
      * 是否已配置该端
      */
-    public boolean contains(UserType userType) {
+    public boolean contains(ClientType userType) {
         return userType != null && serviceMap.containsKey(userType);
     }
 
     /**
      * 已配置的所有端（不可变视图）
      */
-    public Set<UserType> availableTypes() {
+    public Set<ClientType> availableTypes() {
         return serviceMap.keySet();
     }
 

@@ -1,6 +1,7 @@
 package com.we.mall.common.session.service;
 
-import com.we.mall.common.session.enums.ClientType;
+import com.we.mall.common.core.enums.ClientType;
+import com.we.mall.common.core.enums.DeviceType;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.common.session.model.SessionUser;
 
@@ -29,7 +30,7 @@ public interface SessionService {
      * @return sessionId
      */
     String create(ClientType clientType, SessionUser sessionUser,
-                  String loginIp, String userAgent, String deviceType, String deviceName);
+                  String loginIp, String userAgent, DeviceType deviceType, String deviceName);
 
     /**
      * 读取会话

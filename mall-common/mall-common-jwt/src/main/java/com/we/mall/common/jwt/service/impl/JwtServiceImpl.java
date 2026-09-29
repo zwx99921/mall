@@ -1,7 +1,7 @@
 package com.we.mall.common.jwt.service.impl;
 
-import com.we.mall.common.core.enums.UserType;
-import com.we.mall.common.core.constant.JwtConstants;
+import com.we.mall.common.core.enums.ClientType;
+import com.we.mall.common.jwt.constant.JwtConstants;
 import com.we.mall.common.jwt.enums.TokenType;
 import com.we.mall.common.jwt.exception.TokenException;
 import com.we.mall.common.jwt.properties.JwtProperties;
@@ -28,12 +28,12 @@ import java.util.*;
 public class JwtServiceImpl implements JwtService {
 
     private final JwtProperties jwtProperties;
-    private final UserType userType;
+    private final ClientType clientType;
     private final SecretKey signingKey;
 
-    public JwtServiceImpl(JwtProperties jwtProperties, UserType userType) {
+    public JwtServiceImpl(JwtProperties jwtProperties, ClientType clientType) {
         this.jwtProperties = Objects.requireNonNull(jwtProperties, "jwtProperties 不能为 null");
-        this.userType = Objects.requireNonNull(userType, "userType 不能为 null");
+        this.clientType = Objects.requireNonNull(clientType, "clientType 不能为 null");
         this.signingKey = buildSigningKey();
     }
 
@@ -44,7 +44,7 @@ public class JwtServiceImpl implements JwtService {
                                     Set<String> roles, Set<String> perms,
                                     String sessionId) {
         Claims claims = Jwts.claims();
-        claims.put(JwtConstants.CLAIM_USER_TYPE, userType.getCode());
+        claims.put(JwtConstants.CLAIM_CLIENT_TYPE, clientType.getCode());
         claims.put(JwtConstants.CLAIM_TOKEN_TYPE, TokenType.ACCESS.name());
         claims.put(JwtConstants.CLAIM_USERNAME, username);
         if (!CollectionUtils.isEmpty(roles)) {
@@ -62,7 +62,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String createRefreshToken(Long userId, String username, String sessionId) {
         Claims claims = Jwts.claims();
-        claims.put(JwtConstants.CLAIM_USER_TYPE, userType.getCode());
+        claims.put(JwtConstants.CLAIM_CLIENT_TYPE, clientType.getCode());
         claims.put(JwtConstants.CLAIM_TOKEN_TYPE, TokenType.REFRESH.name());
         claims.put(JwtConstants.CLAIM_USERNAME, username);
         if (StringUtils.hasText(sessionId)) {
@@ -148,8 +148,8 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public UserType getUserType() {
-        return userType;
+    public ClientType getUserType() {
+        return clientType;
     }
 
     // ==================== 配置读取 ====================
@@ -179,7 +179,7 @@ public class JwtServiceImpl implements JwtService {
     // ==================== 私有方法 ====================
 
     private JwtProperties.Config getConfig() {
-        return userType == UserType.ADMIN ? jwtProperties.getAdmin() : jwtProperties.getMember();
+        return clientType == ClientType.ADMIN ? jwtProperties.getAdmin() : jwtProperties.getMember();
     }
 
     private SecretKey buildSigningKey() {

@@ -2,7 +2,7 @@ package com.we.mall.gateway.filter;
 
 import com.we.mall.common.core.enums.ResultCode;
 import com.we.mall.common.core.exception.UnauthorizedException;
-import com.we.mall.common.session.context.SessionContext;
+import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.gateway.auth.GatewayAuthenticate;
 import com.we.mall.gateway.properties.GatewayProperties;
 import com.we.mall.gateway.util.InternalHeaderUtils;
@@ -53,16 +53,16 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
 
         // 认证
-        SessionContext ctx = gatewayAuthService.authenticate(request);
-        if (ctx == null) {
+        SessionInfo sessionInfo = gatewayAuthService.authenticate(request);
+        if (sessionInfo == null) {
             throw new UnauthorizedException(ResultCode.UNAUTHORIZED);
         }
 
         // 下发 header，放行
-        ServerHttpRequest mutated = InternalHeaderUtils.buildRequest(exchange.getRequest(), ctx);
+        ServerHttpRequest mutated = InternalHeaderUtils.buildRequest(exchange.getRequest(), sessionInfo);
 
         log.debug("gateway auth ok: userId={}, clientType={}, path={}",
-                ctx.getUser().getUserId(), ctx.getSession().getClientType(), path);
+                sessionInfo.getUserId(), sessionInfo.getClientType(), path);
 
         return chain.filter(exchange.mutate().request(mutated).build());
     }

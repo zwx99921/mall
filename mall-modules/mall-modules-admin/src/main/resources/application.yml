@@ -1,4 +1,9 @@
 server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   port: 9100
   compression:
     enabled: true
@@ -71,7 +76,7 @@ mall:
     clients:
       admin:
         key-prefix: "mall:session:admin:"
-        device-types: [ PC ]
+        device-types: [ DESKTOP,PHONE ]
         same-device-kick: true
         max-per-device: 1
   # 文档

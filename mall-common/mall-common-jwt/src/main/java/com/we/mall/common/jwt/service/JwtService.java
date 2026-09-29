@@ -1,6 +1,6 @@
 package com.we.mall.common.jwt.service;
 
-import com.we.mall.common.core.enums.UserType;
+import com.we.mall.common.core.enums.ClientType;
 import io.jsonwebtoken.Claims;
 
 import java.util.Set;
@@ -102,7 +102,7 @@ public interface JwtService {
     /**
      * 获取用户类型
      */
-    UserType getUserType();
+    ClientType getUserType();
 
     // ==================== 配置读取 ====================
 

@@ -1,5 +1,6 @@
 package com.we.mall.modules.admin.service.impl;
 
+import com.we.mall.common.core.enums.ClientType;
 import com.we.mall.common.core.enums.ResultCode;
 import com.we.mall.common.core.exception.BusinessException;
 import com.we.mall.common.mybatis.result.PageResult;
@@ -7,7 +8,6 @@ import com.we.mall.common.redis.service.RedisKeyOpsService;
 import com.we.mall.common.redis.service.RedisStringOpsService;
 import com.we.mall.common.security.util.SecurityUtils;
 import com.we.mall.common.session.builder.SessionKeyBuilder;
-import com.we.mall.common.session.enums.ClientType;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.common.session.model.SessionUser;
 import com.we.mall.common.session.properties.SessionProperties;
