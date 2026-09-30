@@ -25,6 +25,7 @@
         <module>mall-common-swagger</module>
         <module>mall-common-excel</module>
         <module>mall-common-rpc</module>
+        <module>mall-common-monitor</module>
     </modules>
 
 

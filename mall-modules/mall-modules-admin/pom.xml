@@ -59,6 +59,10 @@
             <groupId>com.we</groupId>
             <artifactId>mall-common-rpc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-monitor</artifactId>
+        </dependency>
 
         <!-- ===================== Mall Api ===================== -->
         <dependency>

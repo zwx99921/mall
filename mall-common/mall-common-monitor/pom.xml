@@ -9,10 +9,9 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>mall-common-core</artifactId>
-
+    <artifactId>mall-common-monitor</artifactId>
     <packaging>jar</packaging>
-    <name>Mall Common Core</name>
+    <name>Mall Common Monitor</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -21,36 +20,38 @@
     </properties>
 
     <dependencies>
-
-        <!-- HuTool -->
+        <!-- Mall Common Core -->
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <groupId>com.we</groupId>
+            <artifactId>mall-common-core</artifactId>
         </dependency>
 
-        <!-- Transmittable Thread Local -->
+        <!-- Spring Web -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>transmittable-thread-local</artifactId>
-        </dependency>
-
-        <!-- Slf4j Api -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Boot Autoconfigure -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <!-- Spring Boot Configuration Processor -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
 
     </dependencies>
 

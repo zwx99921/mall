@@ -5,6 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 服务间通信配置
@@ -28,8 +31,7 @@ public class RpcProperties {
     /**
      * 需要服务凭证校验的内部接口路径，支持 Ant 风格
      */
-    private String internalPaths = "/inner/**";
-
+    private List<String> internalPaths = new ArrayList<>(Arrays.asList("/inner/**", "/actuator/systemInfo"));
 
     /**
      * 启动时校验 serviceToken 必填

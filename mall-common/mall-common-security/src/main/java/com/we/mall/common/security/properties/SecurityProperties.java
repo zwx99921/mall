@@ -42,7 +42,7 @@ public class SecurityProperties {
     /**
      * 排除的路径（不走认证）
      */
-    private List<String> excludePaths = new ArrayList<>(Arrays.asList("/inner/**", "/error"));
+    private List<String> excludePaths = new ArrayList<>(Arrays.asList("/inner/**", "/error", "/actuator/**"));
 
     /**
      * 服务间调用凭证

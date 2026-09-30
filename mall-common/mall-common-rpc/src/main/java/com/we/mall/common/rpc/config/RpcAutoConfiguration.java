@@ -1,7 +1,7 @@
 package com.we.mall.common.rpc.config;
 
-import com.we.mall.common.rpc.interceptor.RpcInboundInterceptor;
-import com.we.mall.common.rpc.interceptor.RpcOutboundInterceptor;
+import com.we.mall.common.rpc.filter.ServiceTokenFilter;
+import com.we.mall.common.rpc.interceptor.ServiceTokenFeignInterceptor;
 import com.we.mall.common.rpc.properties.RpcProperties;
 import feign.RequestInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -10,8 +10,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * 服务间通信自动配置
@@ -25,6 +23,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class RpcAutoConfiguration {
 
     /**
+     * 入站校验 Filter（对 Controller 和 Actuator 端点都生效）
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public ServiceTokenFilter serviceTokenFilter(RpcProperties rpcProperties) {
+        return new ServiceTokenFilter(rpcProperties);
+    }
+
+    /**
      * 出站拦截器：带服务凭证
      */
     @Configuration
@@ -33,28 +40,8 @@ public class RpcAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public RpcOutboundInterceptor rpcOutboundInterceptor(RpcProperties rpcProperties) {
-            return new RpcOutboundInterceptor(rpcProperties.getServiceToken());
-        }
-    }
-
-    /**
-     * 入站拦截器：校验服务凭证
-     */
-    @Configuration
-    @ConditionalOnClass(WebMvcConfigurer.class)
-    public static class InboundConfig implements WebMvcConfigurer {
-
-        private final RpcProperties rpcProperties;
-
-        public InboundConfig(RpcProperties rpcProperties) {
-            this.rpcProperties = rpcProperties;
-        }
-
-        @Override
-        public void addInterceptors(InterceptorRegistry registry) {
-            registry.addInterceptor(new RpcInboundInterceptor(rpcProperties.getServiceToken()))
-                    .addPathPatterns(rpcProperties.getInternalPaths());
+        public ServiceTokenFeignInterceptor serviceTokenFeignInterceptor(RpcProperties rpcProperties) {
+            return new ServiceTokenFeignInterceptor(rpcProperties.getServiceToken());
         }
     }
 

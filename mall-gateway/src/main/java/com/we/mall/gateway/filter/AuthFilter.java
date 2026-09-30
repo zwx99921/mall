@@ -2,11 +2,11 @@ package com.we.mall.gateway.filter;
 
 import com.we.mall.common.core.enums.ResultCode;
 import com.we.mall.common.core.exception.UnauthorizedException;
+import com.we.mall.common.core.util.PathMatcherUtils;
 import com.we.mall.common.session.model.SessionInfo;
 import com.we.mall.gateway.auth.GatewayAuthenticate;
 import com.we.mall.gateway.properties.GatewayProperties;
 import com.we.mall.gateway.util.InternalHeaderUtils;
-import com.we.mall.gateway.util.WhiteListMatcherUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -48,7 +48,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
 
         // 白名单放行
-        if (WhiteListMatcherUtils.match(gatewayProperties.getAllWhiteList(), path)) {
+        if (PathMatcherUtils.matchesAny(gatewayProperties.getAllWhiteList(), path)) {
             return chain.filter(exchange);
         }
 

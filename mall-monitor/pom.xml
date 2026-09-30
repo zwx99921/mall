@@ -5,24 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.we</groupId>
-        <artifactId>mall-auth</artifactId>
+        <artifactId>mall-parent</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>mall-auth-admin</artifactId>
+    <artifactId>mall-monitor</artifactId>
     <packaging>jar</packaging>
-    <name>Mall Auth Admin</name>
+    <name>Mall Monitor</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <kaptcha.version>2.3.2</kaptcha.version>
-        <yauaa.version>7.32.0</yauaa.version>
     </properties>
 
     <dependencies>
+
         <!-- ===================== Mall Common ===================== -->
         <dependency>
             <groupId>com.we</groupId>
@@ -34,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>com.we</groupId>
-            <artifactId>mall-common-jwt</artifactId>
+            <artifactId>mall-common-security</artifactId>
         </dependency>
         <dependency>
             <groupId>com.we</groupId>
@@ -42,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>com.we</groupId>
-            <artifactId>mall-common-swagger</artifactId>
+            <artifactId>mall-common-redis</artifactId>
         </dependency>
         <dependency>
             <groupId>com.we</groupId>
@@ -52,91 +50,31 @@
             <groupId>com.we</groupId>
             <artifactId>mall-common-monitor</artifactId>
         </dependency>
-
-        <!-- ===================== Mall Api ===================== -->
         <dependency>
             <groupId>com.we</groupId>
-            <artifactId>mall-api-admin</artifactId>
+            <artifactId>mall-common-swagger</artifactId>
         </dependency>
 
         <!-- ===================== Boot & Cloud ===================== -->
-        <!-- Spring Security Crypto -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-crypto</artifactId>
-        </dependency>
-
-        <!-- Spring Boot Starter Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
-        <!-- Spring Boot Starter Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Spring Cloud Starer Alibaba Nacos Discovery -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
-
-        <!-- Spring Cloud Starter Alibaba Nacos Config -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-
-        <!-- Spring Cloud Starter Openfeign -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
-
-        <!-- Spring Cloud Starter Loadbalancer -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
-
-        <!-- Spring Cloud Starter Alibaba Sentinel -->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-        </dependency>
-
-        <!-- 规则持久化到 Nacos（可选，推荐生产加） -->
-        <!-- Sentinel Datasource Nacos -->
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-datasource-nacos</artifactId>
-        </dependency>
-
-        <!-- Spring Cloud Starter Bootstrap -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
-
-        <!-- ===================== Tool ===================== -->
-        <!-- 图形验证码 -->
-        <!-- Katcha -->
-        <dependency>
-            <groupId>com.github.penggle</groupId>
-            <artifactId>kaptcha</artifactId>
-            <version>${kaptcha.version}</version>
-        </dependency>
-
-        <!-- UserAgent解析 -->
-        <!-- Yauaa -->
-        <dependency>
-            <groupId>nl.basjes.parse.useragent</groupId>
-            <artifactId>yauaa</artifactId>
-            <version>${yauaa.version}</version>
         </dependency>
 
     </dependencies>

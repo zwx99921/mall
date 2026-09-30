@@ -16,6 +16,7 @@
         <module>mall-auth</module>
         <module>mall-modules</module>
         <module>mall-gateway</module>
+        <module>mall-monitor</module>
     </modules>
 
     <properties>
@@ -221,6 +222,11 @@
             <dependency>
                 <groupId>com.we</groupId>
                 <artifactId>mall-common-rpc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.we</groupId>
+                <artifactId>mall-common-monitor</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

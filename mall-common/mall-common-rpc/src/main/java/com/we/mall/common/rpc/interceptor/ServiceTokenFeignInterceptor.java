@@ -16,11 +16,11 @@ import org.springframework.util.StringUtils;
  * @date 2026-09-28
  * @description
  */
-public class RpcOutboundInterceptor implements RequestInterceptor {
+public class ServiceTokenFeignInterceptor implements RequestInterceptor {
 
     private final String serviceToken;
 
-    public RpcOutboundInterceptor(String serviceToken) {
+    public ServiceTokenFeignInterceptor(String serviceToken) {
         this.serviceToken = serviceToken;
     }
 
